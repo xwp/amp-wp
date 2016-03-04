@@ -31,8 +31,8 @@ class AMP_DOM_Utils {
 		return $out;
 	}
 
-	public static function create_node( $dom, $tag, $attributes ) {
-		$node = $dom->createElement( $tag );
+	public static function create_node( $dom, $tag, $attributes, $content = '' ) {
+		$node = $dom->createElement( $tag, $content );
 		self::add_attributes_to_node( $node, $attributes );
 		return $node;
 	}

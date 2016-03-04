@@ -16,6 +16,7 @@ class AMP_Iframe_Sanitizer extends AMP_Base_Sanitizer {
 
 	protected $DEFAULT_ARGS = array(
 		'add_placeholder' => false,
+		'add_fallback' => false,
 	);
 
 	public function get_scripts() {
@@ -61,6 +62,11 @@ class AMP_Iframe_Sanitizer extends AMP_Base_Sanitizer {
 			if ( true === $this->args['add_placeholder'] ) {
 				$placeholder_node = $this->build_placeholder( $new_attributes );
 				$new_node->appendChild( $placeholder_node );
+			}
+
+			if ( true === $this->args['add_fallback'] ) {
+				$fallback_node = $this->build_fallback( $new_attributes );
+				$new_node->appendChild( $fallback_node );
 			}
 
 			$parent_node = $node->parentNode;
@@ -134,5 +140,21 @@ class AMP_Iframe_Sanitizer extends AMP_Base_Sanitizer {
 		) );
 
 		return $placeholder_node;
+	}
+
+	private function build_fallback( $parent_attributes ) {
+		$node = AMP_DOM_Utils::create_node( $this->dom, 'div', array(
+			'fallback' => '',
+			'class' => 'amp-wp-iframe-fallback',
+		) );
+
+		$link_text = 'View Embed';
+		$link_node = AMP_DOM_Utils::create_node( $this->dom, 'a', array(
+			'href' => $parent_attributes['src']
+		), $link_text );
+
+		$node->appendChild( $link_node );
+
+		return $node;
 	}
 }
