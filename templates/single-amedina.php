@@ -11,15 +11,13 @@
 </head>
 
 <body class="<?php echo esc_attr( $this->get( 'body_class' ) ); ?>">
-<!-- Question (@mo): discuss the use of $this here-->
+
 <?php $this->load_parts( array( 'header-bar' ) ); ?>
 
 <article class="amp-wp-article">
 
 	<header class="amp-wp-article-header">
 		<h1 class="amp-wp-title"><?php echo wp_kses_data( $this->get( 'post_title' ) ); ?></h1>
-        <!-- Question (@mo): how does this work? Right now there are no functions attached to this filter-->
-        <!-- How are the parameters used in the filter function; check taxonomy example in README.md-->
 		<?php $this->load_parts( apply_filters( 'amp_post_article_header_meta', array( 'meta-author', 'meta-time' ) ) ); ?>
 	</header>
 

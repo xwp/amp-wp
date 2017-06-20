@@ -11,6 +11,7 @@
  * License: GPLv2 or later
  */
 
+// TODO (@amedina) Add comments to these definitions
 define( 'AMP__FILE__', __FILE__ );
 define( 'AMP__DIR__', dirname( __FILE__ ) );
 define( 'AMP__VERSION', '0.4.2' );
@@ -18,6 +19,7 @@ define( 'AMP__VERSION', '0.4.2' );
 require_once( AMP__DIR__ . '/back-compat/back-compat.php' );
 require_once( AMP__DIR__ . '/includes/amp-helper-functions.php' );
 require_once( AMP__DIR__ . '/includes/admin/functions.php' );
+require_once( AMP__DIR__ . '/includes/admin/exploratory-functions.php' );
 require_once( AMP__DIR__ . '/includes/settings/class-amp-customizer-settings.php' );
 require_once( AMP__DIR__ . '/includes/settings/class-amp-customizer-design-settings.php' );
 

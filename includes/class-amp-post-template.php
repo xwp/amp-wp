@@ -27,6 +27,7 @@ require_once( AMP__DIR__ . '/includes/embeds/class-amp-vine-embed.php' );
 require_once( AMP__DIR__ . '/includes/embeds/class-amp-facebook-embed.php' );
 require_once( AMP__DIR__ . '/includes/embeds/class-amp-pinterest-embed.php' );
 
+// TODO (@amedina): add PHPdoc to this (and all) function
 class AMP_Post_Template {
 	const SITE_ICON_SIZE = 32;
 	const CONTENT_MAX_WIDTH = 600;
@@ -44,10 +45,13 @@ class AMP_Post_Template {
 		$this->ID = $post_id;
 		$this->post = get_post( $post_id );
 
+		// Question (@mo) Go over $content_width vs $content_max_width
 		$content_max_width = self::CONTENT_MAX_WIDTH;
 		if ( isset( $GLOBALS['content_width'] ) && $GLOBALS['content_width'] > 0 ) {
 			$content_max_width = $GLOBALS['content_width'];
 		}
+
+		// Question (@mo) Should we modify the documentation?
 		$content_max_width = apply_filters( 'amp_content_max_width', $content_max_width );
 
 		$this->data = array(
@@ -58,6 +62,7 @@ class AMP_Post_Template {
 			'home_url' => home_url(),
 			'blog_name' => get_bloginfo( 'name' ),
 
+			// Question (@mo)
 			'html_tag_attributes' => array(),
 			'body_class' => '',
 
@@ -65,6 +70,7 @@ class AMP_Post_Template {
 			'placeholder_image_url' => amp_get_asset_url( 'images/placeholder-icon.png' ),
 
 			'featured_image' => false,
+			// Question (@mo)
 			'comments_link_url' => false,
 			'comments_link_text' => false,
 
@@ -76,7 +82,7 @@ class AMP_Post_Template {
 			'font_urls' => array(
 				'merriweather' => 'https://fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic',
 			),
-
+			// Question (@mo)
 			'post_amp_styles' => array(),
 
 			/**
