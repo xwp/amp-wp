@@ -103,6 +103,7 @@ class AMP_Post_Template {
 		$this->build_customizer_settings();
 		$this->build_html_tag_attributes();
 
+		// Quesiton (@Mo): The goal of this here is just to add the analytics data?
 		$this->data = apply_filters( 'amp_post_template_data', $this->data, $this->post );
 	}
 
@@ -216,6 +217,7 @@ class AMP_Post_Template {
 
 		$comments_open = comments_open( $this->ID );
 
+		// Question (@Mo): Should this be an '||'?
 		// Don't show link if close and no comments
 		if ( ! $comments_open
 			&& ! $this->post->comment_count ) {
@@ -233,7 +235,12 @@ class AMP_Post_Template {
 		) );
 	}
 
+	// Question (@Mo): where is the amp_content_sanitizers filter hook defined?
+	// the constructor of AMP_Content receives a list of embed handlers and a list of
+	// sanitizers, but here it is the result of 'apply_filters'. Why is this done this way,
+	// to pass parameters to the embed handler/sanitizers?
 	private function build_post_content() {
+
 		$amp_content = new AMP_Content( $this->post->post_content,
 			apply_filters( 'amp_content_embed_handlers', array(
 				'AMP_Twitter_Embed_Handler' => array(),
@@ -280,6 +287,7 @@ class AMP_Post_Template {
 
 		$featured_id = get_post_thumbnail_id( $post_id );
 
+		// Question (@Mo): Whay is this the case?
 		// If an image with the same ID as the featured image exists in the content, skip the featured image markup.
 		// Prevents duplicate images, which is especially problematic for photo blogs.
 		// A bit crude but it's fast and should cover most cases.
@@ -289,8 +297,10 @@ class AMP_Post_Template {
 			return;
 		}
 
+		// Question (@Mo): Use get_post to get an image?
 		$featured_image = get_post( $featured_id );
 
+		// Question (@Mo): What scripts, styles are part of $featured_html?
 		list( $sanitized_html, $featured_scripts, $featured_styles ) = AMP_Content_Sanitizer::sanitize(
 			$featured_html,
 			array( 'AMP_Img_Sanitizer' => array() ),
@@ -330,6 +340,7 @@ class AMP_Post_Template {
 		 * @param array   $settings Array of AMP Customizer settings.
 		 * @param WP_Post $post     Current post object.
 		 */
+		// Question (@Mo): There are no functions attache to this filter; what is the idea here?
 		$this->add_data_by_key( 'customizer_settings', apply_filters( 'amp_post_template_customizer_settings', $settings, $this->post ) );
 	}
 

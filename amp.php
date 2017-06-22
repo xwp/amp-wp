@@ -30,7 +30,7 @@ function amp_activate() {
 	}
 	flush_rewrite_rules();
 }
-
+// Question (@Mo): In what moment the plugin is deactivated?
 register_deactivation_hook( __FILE__, 'amp_deactivate' );
 function amp_deactivate() {
 	// We need to manually remove the amp endpoint
@@ -45,24 +45,35 @@ function amp_deactivate() {
 	flush_rewrite_rules();
 }
 
+
 add_action( 'init', 'amp_init' );
 function amp_init() {
+	// Question (@Mo): Why is this needed here? Is it assuming
+	// that the plugin can disabled by the theme or other plugins?
 	if ( false === apply_filters( 'amp_is_enabled', true ) ) {
 		return;
 	}
 
+	// Question (@Mo): How does apply_filter works here? No function is attached; it works as the identity function?
+	// This allows who to change the query var?
 	define( 'AMP_QUERY_VAR', apply_filters( 'amp_query_var', 'amp' ) );
-
 	do_action( 'amp_init' );
 
 	load_plugin_textdomain( 'amp', false, plugin_basename( AMP__DIR__ ) . '/languages' );
 
-	add_rewrite_endpoint( AMP_QUERY_VAR, EP_PERMALINK );
-	add_post_type_support( 'post', AMP_QUERY_VAR );
+	// Question (@Mo): this seems to be a "generalization point"; that is, expand
+	// this check to include other content types (e.g. Pages, Archive, etc).
+	if (get_theme_mod('amp_mode')) {
+		add_rewrite_endpoint( AMP_QUERY_VAR, EP_PERMALINK );
+		add_post_type_support( 'post', AMP_QUERY_VAR );
+		add_post_type_support( 'page', AMP_QUERY_VAR );
+	}
 
+	// Question (@Mo): Why is this needed here?
 	add_filter( 'request', 'amp_force_query_var_value' );
 	add_action( 'wp', 'amp_maybe_add_actions' );
 
+	// Question (@Mo): Why is this needed here?
 	// Redirect the old url of amp page to the updated url.
 	add_filter( 'old_slug_redirect_url', 'amp_redirect_old_slug_to_new_url' );
 
@@ -80,6 +91,7 @@ function amp_force_query_var_value( $query_vars ) {
 	return $query_vars;
 }
 
+// Question (@Mo): Why "maybe"?
 function amp_maybe_add_actions() {
 	if ( ! is_singular() || is_feed() ) {
 		return;
@@ -104,6 +116,8 @@ function amp_maybe_add_actions() {
 	if ( $is_amp_endpoint ) {
 		amp_prepare_render();
 	} else {
+		// Question (@Mo): Why is this this way?
+		// This is only to add the rel="canonical" link in the non-amp page?
 		amp_add_frontend_actions();
 	}
 }
@@ -121,6 +135,7 @@ function amp_add_post_template_actions() {
 	require_once( AMP__DIR__ . '/includes/amp-post-template-functions.php' );
 }
 
+// Question (@Mo): discuss 'template_redirect'
 function amp_prepare_render() {
 	add_action( 'template_redirect', 'amp_render' );
 }

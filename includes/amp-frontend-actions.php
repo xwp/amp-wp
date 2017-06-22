@@ -8,6 +8,8 @@ function amp_frontend_add_canonical() {
 		return;
 	}
 
+	// Question (@Mo): We got here when !is_amp_end_point(); right?
+	// How this returns the right AMP URL?
 	$amp_url = amp_get_permalink( get_queried_object_id() );
 	printf( '<link rel="amphtml" href="%s" />', esc_url( $amp_url ) );
 }

@@ -65,6 +65,9 @@ function amp_post_template_add_styles( $amp_template ) {
 	}
 }
 
+// Question (@Mo): this filter hook gets an attached function only here
+// and then is used via apply_filters in AMP_Post_Template
+// Confusing: add_action + apply_filters
 add_action( 'amp_post_template_data', 'amp_post_template_add_analytics_script' );
 function amp_post_template_add_analytics_script( $data ) {
 	if ( ! empty( $data['amp_analytics'] ) ) {

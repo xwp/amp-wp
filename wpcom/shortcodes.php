@@ -1,5 +1,7 @@
 <?php
 
+// Question (@Mo): why is this filter hook defined here and used when
+// creating the instance of AMP_Content in AMP_Pot_Template?
 add_filter( 'amp_content_embed_handlers', 'wpcom_amp_add_custom_embeds', 10, 2 );
 
 function wpcom_amp_add_custom_embeds( $embed_handler_classes, $post ) {
