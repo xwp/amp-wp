@@ -554,7 +554,6 @@ The plugin defines an analytics option to enable the addition of
 [amp-analytics](https://www.ampproject.org/docs/reference/components/amp-analytics) in your posts. When the plugin is
  active, an AMP top-level menu appears in the Dashboard with one inner sub-menu called 'Analytics'.
 
-![screenshot-1](https://github.com/Automattic/amp-wp/blob/master/screenshot-1.png)
 
 To output proper analytics tags, you can use the `amp_post_template_analytics` filter:
 
