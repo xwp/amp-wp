@@ -1,5 +1,6 @@
 <?php
 
+// @todo Move the requires out of this PHP class file.
 require_once( AMP__DIR__ . '/includes/utils/class-amp-dom-utils.php' );
 require_once( AMP__DIR__ . '/includes/utils/class-amp-html-utils.php' );
 require_once( AMP__DIR__ . '/includes/utils/class-amp-string-utils.php' );
@@ -41,6 +42,7 @@ class AMP_Post_Template {
 	public function __construct( $post_id ) {
 		$this->template_dir = apply_filters( 'amp_post_template_dir', AMP__DIR__ . '/templates' );
 
+		// @todo Declare these class variables.
 		$this->ID = $post_id;
 		$this->post = get_post( $post_id );
 

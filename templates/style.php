@@ -1,4 +1,6 @@
 <?php
+/** @var AMP_Post_Template $this */
+
 // Get content width
 $content_max_width       = absint( $this->get( 'content_max_width' ) );
 

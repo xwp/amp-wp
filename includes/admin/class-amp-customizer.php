@@ -44,6 +44,7 @@ class AMP_Template_Customizer {
 		// Settings need to be registered for regular customize requests as well (since save is handled there)
 		$self->register_settings();
 
+		// @todo The following should be unconditional, with the panel registered with self::is_amp_customizer() as its active_callback.
 		// Our custom panels only need to go for AMP Customizer requests though
 		if ( self::is_amp_customizer() ) {
 			if ( empty( $_GET['url'] ) ) { // input var ok
@@ -77,6 +78,8 @@ class AMP_Template_Customizer {
 	 * Removes all non-AMP sections and panels.
 	 *
 	 * Provides a clean, standalone instance-like experience by removing all non-AMP registered panels and sections.
+	 *
+	 * @todo Eliminate this. The AMP panel can either be contextual to previewing an AMP page, or the preview can automatically navigate to post when opening the AMP panel.
 	 *
 	 * @since 0.4
 	 * @access private

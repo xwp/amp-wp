@@ -25,6 +25,7 @@ require_once( AMP__DIR__ . '/includes/settings/class-amp-customizer-design-setti
 require_once( AMP__DIR__ . '/includes/actions/class-amp-frontend-actions.php' );
 require_once( AMP__DIR__ . '/includes/actions/class-amp-paired-post-actions.php' );
 
+// @todo Activation hooks don't work great with multisite. We may want to consider dynamically filtering rewrite rules instead of statically generating.
 register_activation_hook( __FILE__, 'amp_activate' );
 function amp_activate() {
 	if ( ! did_action( 'amp_init' ) ) {
@@ -83,7 +84,7 @@ function amp_force_query_var_value( $query_vars ) {
 }
 
 function amp_maybe_add_actions() {
-	if ( ! is_singular() || is_feed() ) {
+	if ( ! is_singular() || is_feed() ) { // @todo This should be expanded for Canonical AMP.
 		return;
 	}
 

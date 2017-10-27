@@ -1,5 +1,6 @@
 <?php
 
+// @todo Delete this file since WordPress 4.7 is minimum supported.
 // Was only available in Customizer > 4.6
 if ( ! function_exists( 'sanitize_hex_color' ) ) {
 	function sanitize_hex_color( $color ) {
