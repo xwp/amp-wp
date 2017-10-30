@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for /srv/www/wordpress-develop/public_html/src/wp-content/plugins/amp</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/nv.d3.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+  <!--[if lt IE 9]>
+  <script src="js/html5shiv.min.js"></script>
+  <script src="js/respond.min.js"></script>
+  <![endif]-->
+ </head>
+ <body>
+  <header>
+   <div class="container">
+    <div class="row">
+     <div class="col-md-12">
+      <ol class="breadcrumb">
+        <li><a href="index.html">/srv/www/wordpress-develop/public_html/src/wp-content/plugins/amp</a></li>
+        <li class="active">(Dashboard)</li>
+
+      </ol>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="includes/actions/class-amp-frontend-actions.php.html#6">AMP_Frontend_Actions</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ExifParser.php.html#11">ExifParser</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/options/views/class-amp-options-menu-page.php.html#3">AMP_Options_Menu_Page</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/options/views/class-amp-analytics-options-submenu-page.php.html#5">AMP_Analytics_Options_Submenu_Page</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/options/class-amp-options-menu.php.html#7">AMP_Options_Menu</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/options/class-amp-analytics-options-submenu.php.html#6">AMP_Analytics_Options_Submenu</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="wpcom/class-amp-polldaddy-embed.php.html#3">WPCOM_AMP_Polldaddy_Embed</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/admin/class-amp-customizer.php.html#10">AMP_Template_Customizer</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-gallery-embed.php.html#5">AMP_Gallery_Embed_Handler</a></td><td class="text-right">7%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#12">ImageParser</a></td><td class="text-right">12%</td></tr>
+       <tr><td><a href="includes/settings/class-amp-customizer-design-settings.php.html#3">AMP_Customizer_Design_Settings</a></td><td class="text-right">14%</td></tr>
+       <tr><td><a href="includes/utils/class-amp-wp-utils.php.html#3">AMP_WP_Utils</a></td><td class="text-right">21%</td></tr>
+       <tr><td><a href="includes/lib/fastimage/class-fastimage.php.html#12">FastImage</a></td><td class="text-right">42%</td></tr>
+       <tr><td><a href="includes/options/views/class-amp-options-manager.php.html#5">AMP_Options_Manager</a></td><td class="text-right">66%</td></tr>
+       <tr><td><a href="includes/class-amp-content.php.html#94">AMP_Content_Sanitizer</a></td><td class="text-right">75%</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#30">AMP_Post_Template</a></td><td class="text-right">75%</td></tr>
+       <tr><td><a href="includes/utils/class-amp-html-utils.php.html#3">AMP_HTML_Utils</a></td><td class="text-right">78%</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-base-embed-handler.php.html#6">AMP_Base_Embed_Handler</a></td><td class="text-right">80%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/FasterImage.php.html#19">FasterImage</a></td><td class="text-right">83%</td></tr>
+       <tr><td><a href="includes/actions/class-amp-paired-post-actions.php.html#5">AMP_Paired_Post_Actions</a></td><td class="text-right">85%</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-youtube-embed.php.html#6">AMP_YouTube_Embed_Handler</a></td><td class="text-right">87%</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-soundcloud-embed.php.html#5">AMP_SoundCloud_Embed_Handler</a></td><td class="text-right">88%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#12">ImageParser</a></td><td class="text-right">2336</td></tr>
+       <tr><td><a href="includes/lib/fastimage/class-fastimage.php.html#12">FastImage</a></td><td class="text-right">452</td></tr>
+       <tr><td><a href="includes/admin/class-amp-customizer.php.html#10">AMP_Template_Customizer</a></td><td class="text-right">306</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ExifParser.php.html#11">ExifParser</a></td><td class="text-right">240</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-gallery-embed.php.html#5">AMP_Gallery_Embed_Handler</a></td><td class="text-right">219</td></tr>
+       <tr><td><a href="includes/options/views/class-amp-analytics-options-submenu-page.php.html#5">AMP_Analytics_Options_Submenu_Page</a></td><td class="text-right">110</td></tr>
+       <tr><td><a href="includes/settings/class-amp-customizer-design-settings.php.html#3">AMP_Customizer_Design_Settings</a></td><td class="text-right">101</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#30">AMP_Post_Template</a></td><td class="text-right">86</td></tr>
+       <tr><td><a href="includes/utils/class-amp-wp-utils.php.html#3">AMP_WP_Utils</a></td><td class="text-right">58</td></tr>
+       <tr><td><a href="wpcom/class-amp-polldaddy-embed.php.html#3">WPCOM_AMP_Polldaddy_Embed</a></td><td class="text-right">56</td></tr>
+       <tr><td><a href="includes/options/class-amp-options-menu.php.html#7">AMP_Options_Menu</a></td><td class="text-right">42</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/FasterImage.php.html#19">FasterImage</a></td><td class="text-right">21</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-youtube-embed.php.html#6">AMP_YouTube_Embed_Handler</a></td><td class="text-right">21</td></tr>
+       <tr><td><a href="includes/actions/class-amp-paired-post-actions.php.html#5">AMP_Paired_Post_Actions</a></td><td class="text-right">21</td></tr>
+       <tr><td><a href="includes/options/views/class-amp-options-manager.php.html#5">AMP_Options_Manager</a></td><td class="text-right">19</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-soundcloud-embed.php.html#5">AMP_SoundCloud_Embed_Handler</a></td><td class="text-right">15</td></tr>
+       <tr><td><a href="includes/actions/class-amp-frontend-actions.php.html#6">AMP_Frontend_Actions</a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="includes/utils/class-amp-html-utils.php.html#3">AMP_HTML_Utils</a></td><td class="text-right">7</td></tr>
+       <tr><td><a href="includes/class-amp-content.php.html#94">AMP_Content_Sanitizer</a></td><td class="text-right">4</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="includes/actions/class-amp-frontend-actions.php.html#8"><abbr title="AMP_Frontend_Actions::register_hooks">register_hooks</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fastimage/class-fastimage.php.html#99"><abbr title="FastImage::parseSizeForGIF">parseSizeForGIF</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/options/class-amp-analytics-options-submenu.php.html#26"><abbr title="AMP_Analytics_Options_Submenu::add_submenu">add_submenu</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/options/class-amp-analytics-options-submenu.php.html#18"><abbr title="AMP_Analytics_Options_Submenu::init">init</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/options/class-amp-analytics-options-submenu.php.html#12"><abbr title="AMP_Analytics_Options_Submenu::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fastimage/class-fastimage.php.html#192"><abbr title="FastImage::readInt">readInt</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fastimage/class-fastimage.php.html#186"><abbr title="FastImage::getByte">getByte</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fastimage/class-fastimage.php.html#111"><abbr title="FastImage::parseSizeForJPEG">parseSizeForJPEG</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fastimage/class-fastimage.php.html#104"><abbr title="FastImage::parseSizeForBMP">parseSizeForBMP</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#371"><abbr title="ImageParser::readInt">readInt</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/options/class-amp-options-menu.php.html#13"><abbr title="AMP_Options_Menu::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#361"><abbr title="ImageParser::readByte">readByte</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#351"><abbr title="ImageParser::getByte">getByte</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#295"><abbr title="ImageParser::parseSizeForWebp">parseSizeForWebp</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#280"><abbr title="ImageParser::parseSizeForTiff">parseSizeForTiff</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#178"><abbr title="ImageParser::parseSizeForJPEG">parseSizeForJPEG</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/actions/class-amp-frontend-actions.php.html#12"><abbr title="AMP_Frontend_Actions::add_canonical">add_canonical</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#146"><abbr title="ImageParser::parseSizeForBMP">parseSizeForBMP</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#84"><abbr title="ImageParser::parseSizeForPSD">parseSizeForPSD</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/options/class-amp-analytics-options-submenu.php.html#37"><abbr title="AMP_Analytics_Options_Submenu::amp_options_styles">amp_options_styles</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/options/class-amp-options-menu.php.html#18"><abbr title="AMP_Options_Menu::init">init</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/FasterImage.php.html#85"><abbr title="FasterImage::setTimeout">setTimeout</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/settings/class-amp-customizer-design-settings.php.html#46"><abbr title="AMP_Customizer_Design_Settings::register_customizer_ui">register_customizer_ui</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="wpcom/class-amp-polldaddy-embed.php.html#8"><abbr title="WPCOM_AMP_Polldaddy_Embed::unregister_embed">unregister_embed</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="wpcom/class-amp-polldaddy-embed.php.html#4"><abbr title="WPCOM_AMP_Polldaddy_Embed::register_embed">register_embed</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/utils/class-amp-wp-utils.php.html#43"><abbr title="AMP_WP_Utils::_wp_translate_php_url_constant_to_key">_wp_translate_php_url_constant_to_key</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/utils/class-amp-wp-utils.php.html#25"><abbr title="AMP_WP_Utils::_get_component_from_parsed_url_array">_get_component_from_parsed_url_array</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/settings/class-amp-customizer-design-settings.php.html#146"><abbr title="AMP_Customizer_Design_Settings::sanitize_color_scheme">sanitize_color_scheme</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/settings/class-amp-customizer-design-settings.php.html#110"><abbr title="AMP_Customizer_Design_Settings::get_color_scheme_names">get_color_scheme_names</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/settings/class-amp-customizer-design-settings.php.html#83"><abbr title="AMP_Customizer_Design_Settings::enqueue_customizer_preview_scripts">enqueue_customizer_preview_scripts</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/settings/class-amp-customizer-design-settings.php.html#20"><abbr title="AMP_Customizer_Design_Settings::register_customizer_settings">register_customizer_settings</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/options/class-amp-options-menu.php.html#24"><abbr title="AMP_Options_Menu::add_menu_items">add_menu_items</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/settings/class-amp-customizer-design-settings.php.html#14"><abbr title="AMP_Customizer_Design_Settings::init_customizer">init_customizer</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/settings/class-amp-customizer-design-settings.php.html#8"><abbr title="AMP_Customizer_Design_Settings::init">init</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/options/views/class-amp-options-menu-page.php.html#4"><abbr title="AMP_Options_Menu_Page::render">render</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/options/views/class-amp-options-manager.php.html#30"><abbr title="AMP_Options_Manager::handle_analytics_submit">handle_analytics_submit</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/options/views/class-amp-analytics-options-submenu-page.php.html#89"><abbr title="AMP_Analytics_Options_Submenu_Page::render">render</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/options/views/class-amp-analytics-options-submenu-page.php.html#58"><abbr title="AMP_Analytics_Options_Submenu_Page::render_title">render_title</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/options/views/class-amp-analytics-options-submenu-page.php.html#7"><abbr title="AMP_Analytics_Options_Submenu_Page::render_entry">render_entry</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/options/class-amp-options-menu.php.html#48"><abbr title="AMP_Options_Menu::remove_toplevel_menu_item">remove_toplevel_menu_item</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#68"><abbr title="ImageParser::parseSizeForIco">parseSizeForIco</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#163"><abbr title="ImageParser::parseSizeForGIF">parseSizeForGIF</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ExifParser.php.html#81"><abbr title="ExifParser::parseExifIfd">parseExifIfd</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-gallery-embed.php.html#25"><abbr title="AMP_Gallery_Embed_Handler::shortcode">shortcode</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/admin/class-amp-customizer.php.html#37"><abbr title="AMP_Template_Customizer::init">init</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/admin/class-amp-customizer.php.html#69"><abbr title="AMP_Template_Customizer::_unregister_core_panels">_unregister_core_panels</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/admin/class-amp-customizer.php.html#84"><abbr title="AMP_Template_Customizer::_unregister_core_ui">_unregister_core_ui</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/admin/class-amp-customizer.php.html#97"><abbr title="AMP_Template_Customizer::init_preview">init_preview</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/admin/class-amp-customizer.php.html#107"><abbr title="AMP_Template_Customizer::register_ui">register_ui</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/admin/class-amp-customizer.php.html#126"><abbr title="AMP_Template_Customizer::register_settings">register_settings</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/admin/class-amp-customizer.php.html#130"><abbr title="AMP_Template_Customizer::add_customizer_scripts">add_customizer_scripts</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/admin/class-amp-customizer.php.html#143"><abbr title="AMP_Template_Customizer::add_preview_scripts">add_preview_scripts</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/admin/class-amp-customizer.php.html#158"><abbr title="AMP_Template_Customizer::force_mobile_preview">force_mobile_preview</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/admin/class-amp-customizer.php.html#167"><abbr title="AMP_Template_Customizer::is_amp_customizer">is_amp_customizer</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ExifParser.php.html#72"><abbr title="ExifParser::isRotated">isRotated</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-base-embed-handler.php.html#23"><abbr title="AMP_Base_Embed_Handler::get_scripts">get_scripts</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="wpcom/class-amp-polldaddy-embed.php.html#12"><abbr title="WPCOM_AMP_Polldaddy_Embed::shortcode">shortcode</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ExifParser.php.html#47"><abbr title="ExifParser::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-gallery-embed.php.html#104"><abbr title="AMP_Gallery_Embed_Handler::render">render</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ExifParser.php.html#56"><abbr title="ExifParser::getHeight">getHeight</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ExifParser.php.html#64"><abbr title="ExifParser::getWidth">getWidth</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#266"><abbr title="AMP_Post_Template::build_post_featured_image">build_post_featured_image</abbr></a></td><td class="text-right">19%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#38"><abbr title="ImageParser::parseSize">parseSize</abbr></a></td><td class="text-right">20%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#100"><abbr title="ImageParser::parseType">parseType</abbr></a></td><td class="text-right">31%</td></tr>
+       <tr><td><a href="includes/lib/fastimage/class-fastimage.php.html#78"><abbr title="FastImage::parseSize">parseSize</abbr></a></td><td class="text-right">36%</td></tr>
+       <tr><td><a href="includes/actions/class-amp-paired-post-actions.php.html#64"><abbr title="AMP_Paired_Post_Actions::add_styles">add_styles</abbr></a></td><td class="text-right">42%</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#103"><abbr title="AMP_Post_Template::get">get</abbr></a></td><td class="text-right">50%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/FasterImage.php.html#130"><abbr title="FasterImage::anonymousFunction:130#657">anonymousFunction:130#657</abbr></a></td><td class="text-right">53%</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#413"><abbr title="AMP_Post_Template::is_valid_template">is_valid_template</abbr></a></td><td class="text-right">57%</td></tr>
+       <tr><td><a href="includes/lib/fastimage/class-fastimage.php.html#53"><abbr title="FastImage::getType">getType</abbr></a></td><td class="text-right">60%</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#335"><abbr title="AMP_Post_Template::get_post_image_metadata">get_post_image_metadata</abbr></a></td><td class="text-right">60%</td></tr>
+       <tr><td><a href="includes/utils/class-amp-image-dimension-extractor.php.html#105"><abbr title="AMP_Image_Dimension_Extractor::determine_which_images_to_fetch">determine_which_images_to_fetch</abbr></a></td><td class="text-right">62%</td></tr>
+       <tr><td><a href="includes/lib/fastimage/class-fastimage.php.html#40"><abbr title="FastImage::getSize">getSize</abbr></a></td><td class="text-right">66%</td></tr>
+       <tr><td><a href="includes/utils/class-amp-html-utils.php.html#21"><abbr title="AMP_HTML_Utils::is_valid_json">is_valid_json</abbr></a></td><td class="text-right">66%</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-gallery-embed.php.html#17"><abbr title="AMP_Gallery_Embed_Handler::get_scripts">get_scripts</abbr></a></td><td class="text-right">66%</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/Stream/Stream.php.html#33"><abbr title="Stream::peek">peek</abbr></a></td><td class="text-right">66%</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#391"><abbr title="AMP_Post_Template::verify_and_include">verify_and_include</abbr></a></td><td class="text-right">70%</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-dailymotion-embed.php.html#45"><abbr title="AMP_DailyMotion_Embed_Handler::shortcode">shortcode</abbr></a></td><td class="text-right">72%</td></tr>
+       <tr><td><a href="includes/options/views/class-amp-options-manager.php.html#46"><abbr title="AMP_Options_Manager::update_analytics_options">update_analytics_options</abbr></a></td><td class="text-right">73%</td></tr>
+       <tr><td><a href="includes/actions/class-amp-paired-post-actions.php.html#54"><abbr title="AMP_Paired_Post_Actions::add_schemaorg_metadata">add_schemaorg_metadata</abbr></a></td><td class="text-right">75%</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-instagram-embed.php.html#81"><abbr title="AMP_Instagram_Embed_Handler::get_instagram_id_from_url">get_instagram_id_from_url</abbr></a></td><td class="text-right">75%</td></tr>
+       <tr><td><a href="includes/utils/class-amp-wp-utils.php.html#9"><abbr title="AMP_WP_Utils::parse_url">parse_url</abbr></a></td><td class="text-right">75%</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-soundcloud-embed.php.html#37"><abbr title="AMP_SoundCloud_Embed_Handler::shortcode">shortcode</abbr></a></td><td class="text-right">75%</td></tr>
+       <tr><td><a href="includes/sanitizers/class-amp-blacklist-sanitizer.php.html#179"><abbr title="AMP_Blacklist_Sanitizer::merge_defaults_with_args">merge_defaults_with_args</abbr></a></td><td class="text-right">75%</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#145"><abbr title="AMP_Post_Template::merge_data_for_key">merge_data_for_key</abbr></a></td><td class="text-right">75%</td></tr>
+       <tr><td><a href="includes/settings/class-amp-customizer-design-settings.php.html#136"><abbr title="AMP_Customizer_Design_Settings::get_colors_for_color_scheme">get_colors_for_color_scheme</abbr></a></td><td class="text-right">75%</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#113"><abbr title="AMP_Post_Template::get_customizer_setting">get_customizer_setting</abbr></a></td><td class="text-right">75%</td></tr>
+       <tr><td><a href="includes/class-amp-content.php.html#95"><abbr title="AMP_Content_Sanitizer::sanitize">sanitize</abbr></a></td><td class="text-right">75%</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-youtube-embed.php.html#46"><abbr title="AMP_YouTube_Embed_Handler::shortcode">shortcode</abbr></a></td><td class="text-right">75%</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-vimeo-embed.php.html#46"><abbr title="AMP_Vimeo_Embed_Handler::shortcode">shortcode</abbr></a></td><td class="text-right">76%</td></tr>
+       <tr><td><a href="includes/class-amp-content.php.html#59"><abbr title="AMP_Content::register_embed_handlers">register_embed_handlers</abbr></a></td><td class="text-right">77%</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-youtube-embed.php.html#93"><abbr title="AMP_YouTube_Embed_Handler::get_video_id_from_url">get_video_id_from_url</abbr></a></td><td class="text-right">78%</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-twitter-embed.php.html#66"><abbr title="AMP_Twitter_Embed_Handler::oembed">oembed</abbr></a></td><td class="text-right">83%</td></tr>
+       <tr><td><a href="includes/utils/class-amp-dom-utils.php.html#46"><abbr title="AMP_DOM_Utils::get_node_attributes_as_assoc_array">get_node_attributes_as_assoc_array</abbr></a></td><td class="text-right">83%</td></tr>
+       <tr><td><a href="includes/utils/class-amp-html-utils.php.html#9"><abbr title="AMP_HTML_Utils::build_attributes_string">build_attributes_string</abbr></a></td><td class="text-right">83%</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#206"><abbr title="AMP_Post_Template::build_post_commments_data">build_post_commments_data</abbr></a></td><td class="text-right">85%</td></tr>
+       <tr><td><a href="includes/utils/class-amp-dom-utils.php.html#4"><abbr title="AMP_DOM_Utils::get_dom_from_content">get_dom_from_content</abbr></a></td><td class="text-right">87%</td></tr>
+       <tr><td><a href="includes/actions/class-amp-paired-post-actions.php.html#82"><abbr title="AMP_Paired_Post_Actions::add_analytics_data">add_analytics_data</abbr></a></td><td class="text-right">87%</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#376"><abbr title="AMP_Post_Template::build_html_tag_attributes">build_html_tag_attributes</abbr></a></td><td class="text-right">87%</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#153"><abbr title="AMP_Post_Template::build_post_data">build_post_data</abbr></a></td><td class="text-right">87%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#178"><abbr title="ImageParser::parseSizeForJPEG">parseSizeForJPEG</abbr></a></td><td class="text-right">272</td></tr>
+       <tr><td><a href="includes/lib/fastimage/class-fastimage.php.html#111"><abbr title="FastImage::parseSizeForJPEG">parseSizeForJPEG</abbr></a></td><td class="text-right">156</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ExifParser.php.html#81"><abbr title="ExifParser::parseExifIfd">parseExifIfd</abbr></a></td><td class="text-right">110</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-gallery-embed.php.html#25"><abbr title="AMP_Gallery_Embed_Handler::shortcode">shortcode</abbr></a></td><td class="text-right">90</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#100"><abbr title="ImageParser::parseType">parseType</abbr></a></td><td class="text-right">78</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#38"><abbr title="ImageParser::parseSize">parseSize</abbr></a></td><td class="text-right">61</td></tr>
+       <tr><td><a href="wpcom/class-amp-polldaddy-embed.php.html#12"><abbr title="WPCOM_AMP_Polldaddy_Embed::shortcode">shortcode</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="includes/utils/class-amp-wp-utils.php.html#25"><abbr title="AMP_WP_Utils::_get_component_from_parsed_url_array">_get_component_from_parsed_url_array</abbr></a></td><td class="text-right">30</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#266"><abbr title="AMP_Post_Template::build_post_featured_image">build_post_featured_image</abbr></a></td><td class="text-right">25</td></tr>
+       <tr><td><a href="includes/admin/class-amp-customizer.php.html#37"><abbr title="AMP_Template_Customizer::init">init</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#295"><abbr title="ImageParser::parseSizeForWebp">parseSizeForWebp</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="includes/options/views/class-amp-analytics-options-submenu-page.php.html#58"><abbr title="AMP_Analytics_Options_Submenu_Page::render_title">render_title</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="includes/options/views/class-amp-analytics-options-submenu-page.php.html#7"><abbr title="AMP_Analytics_Options_Submenu_Page::render_entry">render_entry</abbr></a></td><td class="text-right">20</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-gallery-embed.php.html#104"><abbr title="AMP_Gallery_Embed_Handler::render">render</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#68"><abbr title="ImageParser::parseSizeForIco">parseSizeForIco</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="includes/admin/class-amp-customizer.php.html#84"><abbr title="AMP_Template_Customizer::_unregister_core_ui">_unregister_core_ui</abbr></a></td><td class="text-right">12</td></tr>
+       <tr><td><a href="includes/lib/fastimage/class-fastimage.php.html#78"><abbr title="FastImage::parseSize">parseSize</abbr></a></td><td class="text-right">11</td></tr>
+       <tr><td><a href="includes/lib/fastimage/class-fastimage.php.html#53"><abbr title="FastImage::getType">getType</abbr></a></td><td class="text-right">10</td></tr>
+       <tr><td><a href="includes/utils/class-amp-image-dimension-extractor.php.html#105"><abbr title="AMP_Image_Dimension_Extractor::determine_which_images_to_fetch">determine_which_images_to_fetch</abbr></a></td><td class="text-right">7</td></tr>
+       <tr><td><a href="includes/options/views/class-amp-options-manager.php.html#46"><abbr title="AMP_Options_Manager::update_analytics_options">update_analytics_options</abbr></a></td><td class="text-right">7</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-soundcloud-embed.php.html#37"><abbr title="AMP_SoundCloud_Embed_Handler::shortcode">shortcode</abbr></a></td><td class="text-right">7</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#335"><abbr title="AMP_Post_Template::get_post_image_metadata">get_post_image_metadata</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-vimeo-embed.php.html#46"><abbr title="AMP_Vimeo_Embed_Handler::shortcode">shortcode</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-youtube-embed.php.html#93"><abbr title="AMP_YouTube_Embed_Handler::get_video_id_from_url">get_video_id_from_url</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="includes/utils/class-amp-wp-utils.php.html#43"><abbr title="AMP_WP_Utils::_wp_translate_php_url_constant_to_key">_wp_translate_php_url_constant_to_key</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#146"><abbr title="ImageParser::parseSizeForBMP">parseSizeForBMP</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="includes/options/class-amp-options-menu.php.html#24"><abbr title="AMP_Options_Menu::add_menu_items">add_menu_items</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="includes/options/class-amp-options-menu.php.html#48"><abbr title="AMP_Options_Menu::remove_toplevel_menu_item">remove_toplevel_menu_item</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="includes/settings/class-amp-customizer-design-settings.php.html#146"><abbr title="AMP_Customizer_Design_Settings::sanitize_color_scheme">sanitize_color_scheme</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="includes/options/views/class-amp-options-manager.php.html#30"><abbr title="AMP_Options_Manager::handle_analytics_submit">handle_analytics_submit</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="includes/lib/fastimage/class-fastimage.php.html#104"><abbr title="FastImage::parseSizeForBMP">parseSizeForBMP</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="includes/options/views/class-amp-analytics-options-submenu-page.php.html#89"><abbr title="AMP_Analytics_Options_Submenu_Page::render">render</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ImageParser.php.html#280"><abbr title="ImageParser::parseSizeForTiff">parseSizeForTiff</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="includes/actions/class-amp-frontend-actions.php.html#12"><abbr title="AMP_Frontend_Actions::add_canonical">add_canonical</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="includes/admin/class-amp-customizer.php.html#69"><abbr title="AMP_Template_Customizer::_unregister_core_panels">_unregister_core_panels</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="includes/admin/class-amp-customizer.php.html#158"><abbr title="AMP_Template_Customizer::force_mobile_preview">force_mobile_preview</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/ExifParser.php.html#72"><abbr title="ExifParser::isRotated">isRotated</abbr></a></td><td class="text-right">6</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/FasterImage.php.html#130"><abbr title="FasterImage::anonymousFunction:130#657">anonymousFunction:130#657</abbr></a></td><td class="text-right">5</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-dailymotion-embed.php.html#45"><abbr title="AMP_DailyMotion_Embed_Handler::shortcode">shortcode</abbr></a></td><td class="text-right">5</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#413"><abbr title="AMP_Post_Template::is_valid_template">is_valid_template</abbr></a></td><td class="text-right">5</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#206"><abbr title="AMP_Post_Template::build_post_commments_data">build_post_commments_data</abbr></a></td><td class="text-right">5</td></tr>
+       <tr><td><a href="includes/actions/class-amp-paired-post-actions.php.html#64"><abbr title="AMP_Paired_Post_Actions::add_styles">add_styles</abbr></a></td><td class="text-right">4</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-youtube-embed.php.html#46"><abbr title="AMP_YouTube_Embed_Handler::shortcode">shortcode</abbr></a></td><td class="text-right">4</td></tr>
+       <tr><td><a href="includes/class-amp-content.php.html#95"><abbr title="AMP_Content_Sanitizer::sanitize">sanitize</abbr></a></td><td class="text-right">4</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-twitter-embed.php.html#66"><abbr title="AMP_Twitter_Embed_Handler::oembed">oembed</abbr></a></td><td class="text-right">4</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#376"><abbr title="AMP_Post_Template::build_html_tag_attributes">build_html_tag_attributes</abbr></a></td><td class="text-right">4</td></tr>
+       <tr><td><a href="includes/actions/class-amp-paired-post-actions.php.html#82"><abbr title="AMP_Paired_Post_Actions::add_analytics_data">add_analytics_data</abbr></a></td><td class="text-right">4</td></tr>
+       <tr><td><a href="includes/lib/fastimage/class-fastimage.php.html#40"><abbr title="FastImage::getSize">getSize</abbr></a></td><td class="text-right">3</td></tr>
+       <tr><td><a href="includes/utils/class-amp-html-utils.php.html#21"><abbr title="AMP_HTML_Utils::is_valid_json">is_valid_json</abbr></a></td><td class="text-right">3</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#391"><abbr title="AMP_Post_Template::verify_and_include">verify_and_include</abbr></a></td><td class="text-right">3</td></tr>
+       <tr><td><a href="includes/utils/class-amp-wp-utils.php.html#9"><abbr title="AMP_WP_Utils::parse_url">parse_url</abbr></a></td><td class="text-right">3</td></tr>
+       <tr><td><a href="includes/sanitizers/class-amp-blacklist-sanitizer.php.html#179"><abbr title="AMP_Blacklist_Sanitizer::merge_defaults_with_args">merge_defaults_with_args</abbr></a></td><td class="text-right">3</td></tr>
+       <tr><td><a href="includes/class-amp-content.php.html#59"><abbr title="AMP_Content::register_embed_handlers">register_embed_handlers</abbr></a></td><td class="text-right">3</td></tr>
+       <tr><td><a href="includes/utils/class-amp-dom-utils.php.html#46"><abbr title="AMP_DOM_Utils::get_node_attributes_as_assoc_array">get_node_attributes_as_assoc_array</abbr></a></td><td class="text-right">3</td></tr>
+       <tr><td><a href="includes/utils/class-amp-html-utils.php.html#9"><abbr title="AMP_HTML_Utils::build_attributes_string">build_attributes_string</abbr></a></td><td class="text-right">3</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#153"><abbr title="AMP_Post_Template::build_post_data">build_post_data</abbr></a></td><td class="text-right">3</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#103"><abbr title="AMP_Post_Template::get">get</abbr></a></td><td class="text-right">2</td></tr>
+       <tr><td><a href="includes/lib/fasterimage/Stream/Stream.php.html#33"><abbr title="Stream::peek">peek</abbr></a></td><td class="text-right">2</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-gallery-embed.php.html#17"><abbr title="AMP_Gallery_Embed_Handler::get_scripts">get_scripts</abbr></a></td><td class="text-right">2</td></tr>
+       <tr><td><a href="includes/actions/class-amp-paired-post-actions.php.html#54"><abbr title="AMP_Paired_Post_Actions::add_schemaorg_metadata">add_schemaorg_metadata</abbr></a></td><td class="text-right">2</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#145"><abbr title="AMP_Post_Template::merge_data_for_key">merge_data_for_key</abbr></a></td><td class="text-right">2</td></tr>
+       <tr><td><a href="includes/settings/class-amp-customizer-design-settings.php.html#136"><abbr title="AMP_Customizer_Design_Settings::get_colors_for_color_scheme">get_colors_for_color_scheme</abbr></a></td><td class="text-right">2</td></tr>
+       <tr><td><a href="includes/embeds/class-amp-instagram-embed.php.html#81"><abbr title="AMP_Instagram_Embed_Handler::get_instagram_id_from_url">get_instagram_id_from_url</abbr></a></td><td class="text-right">2</td></tr>
+       <tr><td><a href="includes/class-amp-post-template.php.html#113"><abbr title="AMP_Post_Template::get_customizer_setting">get_customizer_setting</abbr></a></td><td class="text-right">2</td></tr>
+       <tr><td><a href="includes/utils/class-amp-dom-utils.php.html#4"><abbr title="AMP_DOM_Utils::get_dom_from_content">get_dom_from_content</abbr></a></td><td class="text-right">2</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 4.0.8</a> using <a href="https://secure.php.net/" target="_top">PHP 7.0.17-2+deb.sury.org~trusty+1</a> with <a href="https://xdebug.org/">Xdebug 2.5.1</a> and <a href="https://phpunit.de/">PHPUnit 5.7.23</a> at Mon Oct 30 7:37:38 UTC 2017.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="js/jquery.min.js" type="text/javascript"></script>
+  <script src="js/bootstrap.min.js" type="text/javascript"></script>
+  <script src="js/holder.min.js" type="text/javascript"></script>
+  <script src="js/d3.min.js" type="text/javascript"></script>
+  <script src="js/nv.d3.min.js" type="text/javascript"></script>
+  <script type="text/javascript">
+$(document).ready(function() {
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#classCoverageDistribution svg')
+      .datum(getCoverageDistributionData([8,1,2,1,0,1,0,1,3,5,16,11], "Class Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.multiBarChart();
+    chart.tooltips(false)
+      .showControls(false)
+      .showLegend(false)
+      .reduceXTicks(false)
+      .staggerLabels(true)
+      .yAxis.tickFormat(d3.format('d'));
+
+    d3.select('#methodCoverageDistribution svg')
+      .datum(getCoverageDistributionData([61,0,1,1,2,1,3,7,16,8,16,184], "Method Coverage"))
+      .transition().duration(500).call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getCoverageDistributionData(data, label) {
+    var labels = [
+      '0%',
+      '0-10%',
+      '10-20%',
+      '20-30%',
+      '30-40%',
+      '40-50%',
+      '50-60%',
+      '60-70%',
+      '70-80%',
+      '80-90%',
+      '90-100%',
+      '100%'
+    ];
+    var values = [];
+    $.each(labels, function(key) {
+      values.push({x: labels[key], y: data[key]});
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Cyclomatic Complexity');
+
+    d3.select('#classComplexity svg')
+      .datum(getComplexityData([[100,8,"<a href=\"includes\/actions\/class-amp-actions.php.html#3\">AMP_Actions<\/a>"],[0,3,"<a href=\"includes\/actions\/class-amp-frontend-actions.php.html#6\">AMP_Frontend_Actions<\/a>"],[85.416666666667,20,"<a href=\"includes\/actions\/class-amp-paired-post-actions.php.html#5\">AMP_Paired_Post_Actions<\/a>"],[0,17,"<a href=\"includes\/admin\/class-amp-customizer.php.html#10\">AMP_Template_Customizer<\/a>"],[94.594594594595,13,"<a href=\"includes\/class-amp-content.php.html#7\">AMP_Content<\/a>"],[75,4,"<a href=\"includes\/class-amp-content.php.html#94\">AMP_Content_Sanitizer<\/a>"],[75.555555555556,50,"<a href=\"includes\/class-amp-post-template.php.html#30\">AMP_Post_Template<\/a>"],[80,4,"<a href=\"includes\/embeds\/class-amp-base-embed-handler.php.html#6\">AMP_Base_Embed_Handler<\/a>"],[91.304347826087,15,"<a href=\"includes\/embeds\/class-amp-dailymotion-embed.php.html#6\">AMP_DailyMotion_Embed_Handler<\/a>"],[94.736842105263,7,"<a href=\"includes\/embeds\/class-amp-facebook-embed.php.html#5\">AMP_Facebook_Embed_Handler<\/a>"],[7.4074074074074,16,"<a href=\"includes\/embeds\/class-amp-gallery-embed.php.html#5\">AMP_Gallery_Embed_Handler<\/a>"],[91.428571428571,12,"<a href=\"includes\/embeds\/class-amp-instagram-embed.php.html#6\">AMP_Instagram_Embed_Handler<\/a>"],[95.652173913043,7,"<a href=\"includes\/embeds\/class-amp-pinterest-embed.php.html#5\">AMP_Pinterest_Embed_Handler<\/a>"],[88.095238095238,15,"<a href=\"includes\/embeds\/class-amp-soundcloud-embed.php.html#5\">AMP_SoundCloud_Embed_Handler<\/a>"],[97.058823529412,15,"<a href=\"includes\/embeds\/class-amp-twitter-embed.php.html#6\">AMP_Twitter_Embed_Handler<\/a>"],[92,17,"<a href=\"includes\/embeds\/class-amp-vimeo-embed.php.html#6\">AMP_Vimeo_Embed_Handler<\/a>"],[94.736842105263,7,"<a href=\"includes\/embeds\/class-amp-vine-embed.php.html#5\">AMP_Vine_Embed_Handler<\/a>"],[87.5,21,"<a href=\"includes\/embeds\/class-amp-youtube-embed.php.html#6\">AMP_YouTube_Embed_Handler<\/a>"],[100,0,"<a href=\"includes\/lib\/fasterimage\/Exception\/InvalidImageException.php.html#8\">InvalidImageException<\/a>"],[0,15,"<a href=\"includes\/lib\/fasterimage\/ExifParser.php.html#11\">ExifParser<\/a>"],[83.018867924528,20,"<a href=\"includes\/lib\/fasterimage\/FasterImage.php.html#19\">FasterImage<\/a>"],[12.179487179487,58,"<a href=\"includes\/lib\/fasterimage\/ImageParser.php.html#12\">ImageParser<\/a>"],[100,0,"<a href=\"includes\/lib\/fasterimage\/Stream\/Exception\/StreamBufferTooSmallException.php.html#8\">StreamBufferTooSmallException<\/a>"],[90,5,"<a href=\"includes\/lib\/fasterimage\/Stream\/Stream.php.html#11\">Stream<\/a>"],[42.307692307692,46,"<a href=\"includes\/lib\/fastimage\/class-fastimage.php.html#12\">FastImage<\/a>"],[0,4,"<a href=\"includes\/options\/class-amp-analytics-options-submenu.php.html#6\">AMP_Analytics_Options_Submenu<\/a>"],[0,6,"<a href=\"includes\/options\/class-amp-options-menu.php.html#7\">AMP_Options_Menu<\/a>"],[0,10,"<a href=\"includes\/options\/views\/class-amp-analytics-options-submenu-page.php.html#5\">AMP_Analytics_Options_Submenu_Page<\/a>"],[66.666666666667,13,"<a href=\"includes\/options\/views\/class-amp-options-manager.php.html#5\">AMP_Options_Manager<\/a>"],[0,1,"<a href=\"includes\/options\/views\/class-amp-options-menu-page.php.html#3\">AMP_Options_Menu_Page<\/a>"],[100,3,"<a href=\"includes\/sanitizers\/class-amp-allowed-tags-generated.php.html#12\">AMP_Allowed_Tags_Generated<\/a>"],[100,20,"<a href=\"includes\/sanitizers\/class-amp-audio-sanitizer.php.html#5\">AMP_Audio_Sanitizer<\/a>"],[100,28,"<a href=\"includes\/sanitizers\/class-amp-base-sanitizer.php.html#3\">AMP_Base_Sanitizer<\/a>"],[98.958333333333,46,"<a href=\"includes\/sanitizers\/class-amp-blacklist-sanitizer.php.html#14\">AMP_Blacklist_Sanitizer<\/a>"],[100,25,"<a href=\"includes\/sanitizers\/class-amp-iframe-sanitizer.php.html#8\">AMP_Iframe_Sanitizer<\/a>"],[98.461538461538,31,"<a href=\"includes\/sanitizers\/class-amp-img-sanitizer.php.html#9\">AMP_Img_Sanitizer<\/a>"],[97.560975609756,17,"<a href=\"includes\/sanitizers\/class-amp-playbuzz-sanitizer.php.html#8\">AMP_Playbuzz_Sanitizer<\/a>"],[97.872340425532,22,"<a href=\"includes\/sanitizers\/class-amp-style-sanitizer.php.html#8\">AMP_Style_Sanitizer<\/a>"],[98.567335243553,202,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#23\">AMP_Tag_And_Attribute_Sanitizer<\/a>"],[100,0,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#895\">AMP_Rule_Spec<\/a>"],[100,23,"<a href=\"includes\/sanitizers\/class-amp-video-sanitizer.php.html#8\">AMP_Video_Sanitizer<\/a>"],[14.516129032258,12,"<a href=\"includes\/settings\/class-amp-customizer-design-settings.php.html#3\">AMP_Customizer_Design_Settings<\/a>"],[100,2,"<a href=\"includes\/settings\/class-amp-customizer-settings.php.html#3\">AMP_Customizer_Settings<\/a>"],[95.555555555556,19,"<a href=\"includes\/utils\/class-amp-dom-utils.php.html#3\">AMP_DOM_Utils<\/a>"],[78.571428571429,7,"<a href=\"includes\/utils\/class-amp-html-utils.php.html#3\">AMP_HTML_Utils<\/a>"],[91.509433962264,34,"<a href=\"includes\/utils\/class-amp-image-dimension-extractor.php.html#3\">AMP_Image_Dimension_Extractor<\/a>"],[100,3,"<a href=\"includes\/utils\/class-amp-string-utils.php.html#3\">AMP_String_Utils<\/a>"],[21.428571428571,10,"<a href=\"includes\/utils\/class-amp-wp-utils.php.html#3\">AMP_WP_Utils<\/a>"],[0,7,"<a href=\"wpcom\/class-amp-polldaddy-embed.php.html#3\">WPCOM_AMP_Polldaddy_Embed<\/a>"]], 'Class Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  nv.addGraph(function() {
+    var chart = nv.models.scatterChart()
+      .showDistX(true)
+      .showDistY(true)
+      .showLegend(false)
+      .forceX([0, 100]);
+    chart.tooltipContent(function(graph) {
+      return '<p>' + graph.point.class + '</p>';
+    });
+
+    chart.xAxis.axisLabel('Code Coverage (in percent)');
+    chart.yAxis.axisLabel('Method Complexity');
+
+    d3.select('#methodComplexity svg')
+      .datum(getComplexityData([[100,1,"<a href=\"includes\/actions\/class-amp-actions.php.html#4\">AMP_Actions::add_scripts<\/a>"],[100,1,"<a href=\"includes\/actions\/class-amp-actions.php.html#5\">AMP_Actions::add_styles<\/a>"],[100,1,"<a href=\"includes\/actions\/class-amp-actions.php.html#6\">AMP_Actions::add_fonts<\/a>"],[100,1,"<a href=\"includes\/actions\/class-amp-actions.php.html#7\">AMP_Actions::add_boilerplate_css<\/a>"],[100,1,"<a href=\"includes\/actions\/class-amp-actions.php.html#8\">AMP_Actions::add_schemaorg_metadata<\/a>"],[100,1,"<a href=\"includes\/actions\/class-amp-actions.php.html#9\">AMP_Actions::add_analytics_scripts<\/a>"],[100,1,"<a href=\"includes\/actions\/class-amp-actions.php.html#10\">AMP_Actions::add_analytics_data<\/a>"],[100,1,"<a href=\"includes\/actions\/class-amp-actions.php.html#11\">AMP_Actions::add_canonical_link<\/a>"],[0,1,"<a href=\"includes\/actions\/class-amp-frontend-actions.php.html#8\">AMP_Frontend_Actions::register_hooks<\/a>"],[0,2,"<a href=\"includes\/actions\/class-amp-frontend-actions.php.html#12\">AMP_Frontend_Actions::add_canonical<\/a>"],[100,1,"<a href=\"includes\/actions\/class-amp-paired-post-actions.php.html#7\">AMP_Paired_Post_Actions::register_hooks<\/a>"],[100,1,"<a href=\"includes\/actions\/class-amp-paired-post-actions.php.html#19\">AMP_Paired_Post_Actions::add_title<\/a>"],[100,1,"<a href=\"includes\/actions\/class-amp-paired-post-actions.php.html#25\">AMP_Paired_Post_Actions::add_canonical_link<\/a>"],[100,3,"<a href=\"includes\/actions\/class-amp-paired-post-actions.php.html#31\">AMP_Paired_Post_Actions::add_scripts<\/a>"],[100,2,"<a href=\"includes\/actions\/class-amp-paired-post-actions.php.html#41\">AMP_Paired_Post_Actions::add_fonts<\/a>"],[100,1,"<a href=\"includes\/actions\/class-amp-paired-post-actions.php.html#48\">AMP_Paired_Post_Actions::add_boilerplate_css<\/a>"],[75,2,"<a href=\"includes\/actions\/class-amp-paired-post-actions.php.html#54\">AMP_Paired_Post_Actions::add_schemaorg_metadata<\/a>"],[42.857142857143,3,"<a href=\"includes\/actions\/class-amp-paired-post-actions.php.html#64\">AMP_Paired_Post_Actions::add_styles<\/a>"],[100,2,"<a href=\"includes\/actions\/class-amp-paired-post-actions.php.html#75\">AMP_Paired_Post_Actions::add_analytics_scripts<\/a>"],[87.5,4,"<a href=\"includes\/actions\/class-amp-paired-post-actions.php.html#82\">AMP_Paired_Post_Actions::add_analytics_data<\/a>"],[0,4,"<a href=\"includes\/admin\/class-amp-customizer.php.html#37\">AMP_Template_Customizer::init<\/a>"],[0,2,"<a href=\"includes\/admin\/class-amp-customizer.php.html#69\">AMP_Template_Customizer::_unregister_core_panels<\/a>"],[0,3,"<a href=\"includes\/admin\/class-amp-customizer.php.html#84\">AMP_Template_Customizer::_unregister_core_ui<\/a>"],[0,1,"<a href=\"includes\/admin\/class-amp-customizer.php.html#97\">AMP_Template_Customizer::init_preview<\/a>"],[0,1,"<a href=\"includes\/admin\/class-amp-customizer.php.html#107\">AMP_Template_Customizer::register_ui<\/a>"],[0,1,"<a href=\"includes\/admin\/class-amp-customizer.php.html#126\">AMP_Template_Customizer::register_settings<\/a>"],[0,1,"<a href=\"includes\/admin\/class-amp-customizer.php.html#130\">AMP_Template_Customizer::add_customizer_scripts<\/a>"],[0,1,"<a href=\"includes\/admin\/class-amp-customizer.php.html#143\">AMP_Template_Customizer::add_preview_scripts<\/a>"],[0,2,"<a href=\"includes\/admin\/class-amp-customizer.php.html#158\">AMP_Template_Customizer::force_mobile_preview<\/a>"],[0,1,"<a href=\"includes\/admin\/class-amp-customizer.php.html#167\">AMP_Template_Customizer::is_amp_customizer<\/a>"],[100,1,"<a href=\"includes\/class-amp-content.php.html#16\">AMP_Content::__construct<\/a>"],[100,1,"<a href=\"includes\/class-amp-content.php.html#25\">AMP_Content::get_amp_content<\/a>"],[100,1,"<a href=\"includes\/class-amp-content.php.html#29\">AMP_Content::get_amp_scripts<\/a>"],[100,1,"<a href=\"includes\/class-amp-content.php.html#33\">AMP_Content::get_amp_styles<\/a>"],[100,1,"<a href=\"includes\/class-amp-content.php.html#37\">AMP_Content::transform<\/a>"],[100,1,"<a href=\"includes\/class-amp-content.php.html#51\">AMP_Content::add_scripts<\/a>"],[100,1,"<a href=\"includes\/class-amp-content.php.html#55\">AMP_Content::add_styles<\/a>"],[77.777777777778,3,"<a href=\"includes\/class-amp-content.php.html#59\">AMP_Content::register_embed_handlers<\/a>"],[100,2,"<a href=\"includes\/class-amp-content.php.html#77\">AMP_Content::unregister_embed_handlers<\/a>"],[100,1,"<a href=\"includes\/class-amp-content.php.html#84\">AMP_Content::sanitize<\/a>"],[75,4,"<a href=\"includes\/class-amp-content.php.html#95\">AMP_Content_Sanitizer::sanitize<\/a>"],[95.833333333333,5,"<a href=\"includes\/class-amp-post-template.php.html#41\">AMP_Post_Template::__construct<\/a>"],[50,2,"<a href=\"includes\/class-amp-post-template.php.html#103\">AMP_Post_Template::get<\/a>"],[75,2,"<a href=\"includes\/class-amp-post-template.php.html#113\">AMP_Post_Template::get_customizer_setting<\/a>"],[100,1,"<a href=\"includes\/class-amp-post-template.php.html#122\">AMP_Post_Template::load<\/a>"],[100,2,"<a href=\"includes\/class-amp-post-template.php.html#126\">AMP_Post_Template::load_parts<\/a>"],[100,1,"<a href=\"includes\/class-amp-post-template.php.html#133\">AMP_Post_Template::get_template_path<\/a>"],[100,1,"<a href=\"includes\/class-amp-post-template.php.html#137\">AMP_Post_Template::add_data<\/a>"],[100,1,"<a href=\"includes\/class-amp-post-template.php.html#141\">AMP_Post_Template::add_data_by_key<\/a>"],[75,2,"<a href=\"includes\/class-amp-post-template.php.html#145\">AMP_Post_Template::merge_data_for_key<\/a>"],[87.878787878788,3,"<a href=\"includes\/class-amp-post-template.php.html#153\">AMP_Post_Template::build_post_data<\/a>"],[85.714285714286,5,"<a href=\"includes\/class-amp-post-template.php.html#206\">AMP_Post_Template::build_post_commments_data<\/a>"],[100,1,"<a href=\"includes\/class-amp-post-template.php.html#230\">AMP_Post_Template::build_post_content<\/a>"],[19.047619047619,6,"<a href=\"includes\/class-amp-post-template.php.html#266\">AMP_Post_Template::build_post_featured_image<\/a>"],[100,1,"<a href=\"includes\/class-amp-post-template.php.html#310\">AMP_Post_Template::build_customizer_settings<\/a>"],[60.869565217391,5,"<a href=\"includes\/class-amp-post-template.php.html#335\">AMP_Post_Template::get_post_image_metadata<\/a>"],[87.5,4,"<a href=\"includes\/class-amp-post-template.php.html#376\">AMP_Post_Template::build_html_tag_attributes<\/a>"],[70,3,"<a href=\"includes\/class-amp-post-template.php.html#391\">AMP_Post_Template::verify_and_include<\/a>"],[100,1,"<a href=\"includes\/class-amp-post-template.php.html#408\">AMP_Post_Template::locate_template<\/a>"],[57.142857142857,4,"<a href=\"includes\/class-amp-post-template.php.html#413\">AMP_Post_Template::is_valid_template<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-base-embed-handler.php.html#13\">AMP_Base_Embed_Handler::register_embed<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-base-embed-handler.php.html#14\">AMP_Base_Embed_Handler::unregister_embed<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-base-embed-handler.php.html#16\">AMP_Base_Embed_Handler::__construct<\/a>"],[0,1,"<a href=\"includes\/embeds\/class-amp-base-embed-handler.php.html#23\">AMP_Base_Embed_Handler::get_scripts<\/a>"],[100,2,"<a href=\"includes\/embeds\/class-amp-dailymotion-embed.php.html#17\">AMP_DailyMotion_Embed_Handler::__construct<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-dailymotion-embed.php.html#27\">AMP_DailyMotion_Embed_Handler::register_embed<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-dailymotion-embed.php.html#32\">AMP_DailyMotion_Embed_Handler::unregister_embed<\/a>"],[100,2,"<a href=\"includes\/embeds\/class-amp-dailymotion-embed.php.html#37\">AMP_DailyMotion_Embed_Handler::get_scripts<\/a>"],[72.727272727273,5,"<a href=\"includes\/embeds\/class-amp-dailymotion-embed.php.html#45\">AMP_DailyMotion_Embed_Handler::shortcode<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-dailymotion-embed.php.html#65\">AMP_DailyMotion_Embed_Handler::oembed<\/a>"],[90.909090909091,2,"<a href=\"includes\/embeds\/class-amp-dailymotion-embed.php.html#72\">AMP_DailyMotion_Embed_Handler::render<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-dailymotion-embed.php.html#94\">AMP_DailyMotion_Embed_Handler::get_video_id_from_url<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-facebook-embed.php.html#14\">AMP_Facebook_Embed_Handler::register_embed<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-facebook-embed.php.html#18\">AMP_Facebook_Embed_Handler::unregister_embed<\/a>"],[100,2,"<a href=\"includes\/embeds\/class-amp-facebook-embed.php.html#22\">AMP_Facebook_Embed_Handler::get_scripts<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-facebook-embed.php.html#30\">AMP_Facebook_Embed_Handler::oembed<\/a>"],[90.909090909091,2,"<a href=\"includes\/embeds\/class-amp-facebook-embed.php.html#34\">AMP_Facebook_Embed_Handler::render<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-gallery-embed.php.html#9\">AMP_Gallery_Embed_Handler::register_embed<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-gallery-embed.php.html#13\">AMP_Gallery_Embed_Handler::unregister_embed<\/a>"],[66.666666666667,2,"<a href=\"includes\/embeds\/class-amp-gallery-embed.php.html#17\">AMP_Gallery_Embed_Handler::get_scripts<\/a>"],[0,9,"<a href=\"includes\/embeds\/class-amp-gallery-embed.php.html#25\">AMP_Gallery_Embed_Handler::shortcode<\/a>"],[0,3,"<a href=\"includes\/embeds\/class-amp-gallery-embed.php.html#104\">AMP_Gallery_Embed_Handler::render<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-instagram-embed.php.html#16\">AMP_Instagram_Embed_Handler::register_embed<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-instagram-embed.php.html#21\">AMP_Instagram_Embed_Handler::unregister_embed<\/a>"],[100,2,"<a href=\"includes\/embeds\/class-amp-instagram-embed.php.html#26\">AMP_Instagram_Embed_Handler::get_scripts<\/a>"],[90,3,"<a href=\"includes\/embeds\/class-amp-instagram-embed.php.html#34\">AMP_Instagram_Embed_Handler::shortcode<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-instagram-embed.php.html#54\">AMP_Instagram_Embed_Handler::oembed<\/a>"],[90.909090909091,2,"<a href=\"includes\/embeds\/class-amp-instagram-embed.php.html#58\">AMP_Instagram_Embed_Handler::render<\/a>"],[75,2,"<a href=\"includes\/embeds\/class-amp-instagram-embed.php.html#81\">AMP_Instagram_Embed_Handler::get_instagram_id_from_url<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-pinterest-embed.php.html#15\">AMP_Pinterest_Embed_Handler::register_embed<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-pinterest-embed.php.html#23\">AMP_Pinterest_Embed_Handler::unregister_embed<\/a>"],[100,2,"<a href=\"includes\/embeds\/class-amp-pinterest-embed.php.html#27\">AMP_Pinterest_Embed_Handler::get_scripts<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-pinterest-embed.php.html#35\">AMP_Pinterest_Embed_Handler::oembed<\/a>"],[90.909090909091,2,"<a href=\"includes\/embeds\/class-amp-pinterest-embed.php.html#39\">AMP_Pinterest_Embed_Handler::render<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-soundcloud-embed.php.html#12\">AMP_SoundCloud_Embed_Handler::register_embed<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-soundcloud-embed.php.html#17\">AMP_SoundCloud_Embed_Handler::unregister_embed<\/a>"],[100,2,"<a href=\"includes\/embeds\/class-amp-soundcloud-embed.php.html#22\">AMP_SoundCloud_Embed_Handler::get_scripts<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-soundcloud-embed.php.html#30\">AMP_SoundCloud_Embed_Handler::oembed<\/a>"],[75,7,"<a href=\"includes\/embeds\/class-amp-soundcloud-embed.php.html#37\">AMP_SoundCloud_Embed_Handler::shortcode<\/a>"],[90,2,"<a href=\"includes\/embeds\/class-amp-soundcloud-embed.php.html#67\">AMP_SoundCloud_Embed_Handler::render<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-soundcloud-embed.php.html#88\">AMP_SoundCloud_Embed_Handler::get_track_id_from_url<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-twitter-embed.php.html#12\">AMP_Twitter_Embed_Handler::register_embed<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-twitter-embed.php.html#17\">AMP_Twitter_Embed_Handler::unregister_embed<\/a>"],[100,2,"<a href=\"includes\/embeds\/class-amp-twitter-embed.php.html#22\">AMP_Twitter_Embed_Handler::get_scripts<\/a>"],[100,7,"<a href=\"includes\/embeds\/class-amp-twitter-embed.php.html#30\">AMP_Twitter_Embed_Handler::shortcode<\/a>"],[83.333333333333,4,"<a href=\"includes\/embeds\/class-amp-twitter-embed.php.html#66\">AMP_Twitter_Embed_Handler::oembed<\/a>"],[100,2,"<a href=\"includes\/embeds\/class-amp-vimeo-embed.php.html#18\">AMP_Vimeo_Embed_Handler::__construct<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-vimeo-embed.php.html#28\">AMP_Vimeo_Embed_Handler::register_embed<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-vimeo-embed.php.html#33\">AMP_Vimeo_Embed_Handler::unregister_embed<\/a>"],[100,2,"<a href=\"includes\/embeds\/class-amp-vimeo-embed.php.html#38\">AMP_Vimeo_Embed_Handler::get_scripts<\/a>"],[76.923076923077,6,"<a href=\"includes\/embeds\/class-amp-vimeo-embed.php.html#46\">AMP_Vimeo_Embed_Handler::shortcode<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-vimeo-embed.php.html#68\">AMP_Vimeo_Embed_Handler::oembed<\/a>"],[90.909090909091,2,"<a href=\"includes\/embeds\/class-amp-vimeo-embed.php.html#77\">AMP_Vimeo_Embed_Handler::render<\/a>"],[100,2,"<a href=\"includes\/embeds\/class-amp-vimeo-embed.php.html#102\">AMP_Vimeo_Embed_Handler::get_video_id_from_url<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-vine-embed.php.html#14\">AMP_Vine_Embed_Handler::register_embed<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-vine-embed.php.html#18\">AMP_Vine_Embed_Handler::unregister_embed<\/a>"],[100,2,"<a href=\"includes\/embeds\/class-amp-vine-embed.php.html#22\">AMP_Vine_Embed_Handler::get_scripts<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-vine-embed.php.html#30\">AMP_Vine_Embed_Handler::oembed<\/a>"],[90.909090909091,2,"<a href=\"includes\/embeds\/class-amp-vine-embed.php.html#34\">AMP_Vine_Embed_Handler::render<\/a>"],[100,2,"<a href=\"includes\/embeds\/class-amp-youtube-embed.php.html#18\">AMP_YouTube_Embed_Handler::__construct<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-youtube-embed.php.html#28\">AMP_YouTube_Embed_Handler::register_embed<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-youtube-embed.php.html#33\">AMP_YouTube_Embed_Handler::unregister_embed<\/a>"],[100,2,"<a href=\"includes\/embeds\/class-amp-youtube-embed.php.html#38\">AMP_YouTube_Embed_Handler::get_scripts<\/a>"],[75,4,"<a href=\"includes\/embeds\/class-amp-youtube-embed.php.html#46\">AMP_YouTube_Embed_Handler::shortcode<\/a>"],[100,1,"<a href=\"includes\/embeds\/class-amp-youtube-embed.php.html#67\">AMP_YouTube_Embed_Handler::oembed<\/a>"],[90.909090909091,2,"<a href=\"includes\/embeds\/class-amp-youtube-embed.php.html#71\">AMP_YouTube_Embed_Handler::render<\/a>"],[78.571428571429,6,"<a href=\"includes\/embeds\/class-amp-youtube-embed.php.html#93\">AMP_YouTube_Embed_Handler::get_video_id_from_url<\/a>"],[100,2,"<a href=\"includes\/embeds\/class-amp-youtube-embed.php.html#124\">AMP_YouTube_Embed_Handler::sanitize_v_arg<\/a>"],[0,1,"<a href=\"includes\/lib\/fasterimage\/ExifParser.php.html#47\">ExifParser::__construct<\/a>"],[0,1,"<a href=\"includes\/lib\/fasterimage\/ExifParser.php.html#56\">ExifParser::getHeight<\/a>"],[0,1,"<a href=\"includes\/lib\/fasterimage\/ExifParser.php.html#64\">ExifParser::getWidth<\/a>"],[0,2,"<a href=\"includes\/lib\/fasterimage\/ExifParser.php.html#72\">ExifParser::isRotated<\/a>"],[0,10,"<a href=\"includes\/lib\/fasterimage\/ExifParser.php.html#81\">ExifParser::parseExifIfd<\/a>"],[94.736842105263,11,"<a href=\"includes\/lib\/fasterimage\/FasterImage.php.html#36\">FasterImage::batch<\/a>"],[0,1,"<a href=\"includes\/lib\/fasterimage\/FasterImage.php.html#85\">FasterImage::setTimeout<\/a>"],[100,4,"<a href=\"includes\/lib\/fasterimage\/FasterImage.php.html#98\">FasterImage::handle<\/a>"],[53.846153846154,4,"<a href=\"includes\/lib\/fasterimage\/FasterImage.php.html#130\">FasterImage::anonymousFunction:130#657<\/a>"],[100,1,"<a href=\"includes\/lib\/fasterimage\/ImageParser.php.html#30\">ImageParser::__construct<\/a>"],[20,10,"<a href=\"includes\/lib\/fasterimage\/ImageParser.php.html#38\">ImageParser::parseSize<\/a>"],[0,3,"<a href=\"includes\/lib\/fasterimage\/ImageParser.php.html#68\">ImageParser::parseSizeForIco<\/a>"],[0,1,"<a href=\"includes\/lib\/fasterimage\/ImageParser.php.html#84\">ImageParser::parseSizeForPSD<\/a>"],[31.034482758621,14,"<a href=\"includes\/lib\/fasterimage\/ImageParser.php.html#100\">ImageParser::parseType<\/a>"],[0,2,"<a href=\"includes\/lib\/fasterimage\/ImageParser.php.html#146\">ImageParser::parseSizeForBMP<\/a>"],[0,1,"<a href=\"includes\/lib\/fasterimage\/ImageParser.php.html#163\">ImageParser::parseSizeForGIF<\/a>"],[0,16,"<a href=\"includes\/lib\/fasterimage\/ImageParser.php.html#178\">ImageParser::parseSizeForJPEG<\/a>"],[100,1,"<a href=\"includes\/lib\/fasterimage\/ImageParser.php.html#262\">ImageParser::parseSizeForPNG<\/a>"],[0,2,"<a href=\"includes\/lib\/fasterimage\/ImageParser.php.html#280\">ImageParser::parseSizeForTiff<\/a>"],[0,4,"<a href=\"includes\/lib\/fasterimage\/ImageParser.php.html#295\">ImageParser::parseSizeForWebp<\/a>"],[0,1,"<a href=\"includes\/lib\/fasterimage\/ImageParser.php.html#351\">ImageParser::getByte<\/a>"],[0,1,"<a href=\"includes\/lib\/fasterimage\/ImageParser.php.html#361\">ImageParser::readByte<\/a>"],[0,1,"<a href=\"includes\/lib\/fasterimage\/ImageParser.php.html#371\">ImageParser::readInt<\/a>"],[66.666666666667,2,"<a href=\"includes\/lib\/fasterimage\/Stream\/Stream.php.html#33\">Stream::peek<\/a>"],[100,1,"<a href=\"includes\/lib\/fasterimage\/Stream\/Stream.php.html#50\">Stream::read<\/a>"],[100,1,"<a href=\"includes\/lib\/fasterimage\/Stream\/Stream.php.html#64\">Stream::resetPointer<\/a>"],[100,1,"<a href=\"includes\/lib\/fasterimage\/Stream\/Stream.php.html#74\">Stream::write<\/a>"],[100,2,"<a href=\"includes\/lib\/fastimage\/class-fastimage.php.html#18\">FastImage::__construct<\/a>"],[100,3,"<a href=\"includes\/lib\/fastimage\/class-fastimage.php.html#22\">FastImage::load<\/a>"],[100,2,"<a href=\"includes\/lib\/fastimage\/class-fastimage.php.html#30\">FastImage::close<\/a>"],[66.666666666667,3,"<a href=\"includes\/lib\/fastimage\/class-fastimage.php.html#40\">FastImage::getSize<\/a>"],[60,7,"<a href=\"includes\/lib\/fastimage\/class-fastimage.php.html#53\">FastImage::getType<\/a>"],[36.363636363636,5,"<a href=\"includes\/lib\/fastimage\/class-fastimage.php.html#78\">FastImage::parseSize<\/a>"],[100,1,"<a href=\"includes\/lib\/fastimage\/class-fastimage.php.html#94\">FastImage::parseSizeForPNG<\/a>"],[0,1,"<a href=\"includes\/lib\/fastimage\/class-fastimage.php.html#99\">FastImage::parseSizeForGIF<\/a>"],[0,2,"<a href=\"includes\/lib\/fastimage\/class-fastimage.php.html#104\">FastImage::parseSizeForBMP<\/a>"],[0,12,"<a href=\"includes\/lib\/fastimage\/class-fastimage.php.html#111\">FastImage::parseSizeForJPEG<\/a>"],[90.909090909091,5,"<a href=\"includes\/lib\/fastimage\/class-fastimage.php.html#161\">FastImage::getChars<\/a>"],[0,1,"<a href=\"includes\/lib\/fastimage\/class-fastimage.php.html#186\">FastImage::getByte<\/a>"],[0,1,"<a href=\"includes\/lib\/fastimage\/class-fastimage.php.html#192\">FastImage::readInt<\/a>"],[100,1,"<a href=\"includes\/lib\/fastimage\/class-fastimage.php.html#197\">FastImage::__destruct<\/a>"],[0,1,"<a href=\"includes\/options\/class-amp-analytics-options-submenu.php.html#12\">AMP_Analytics_Options_Submenu::__construct<\/a>"],[0,1,"<a href=\"includes\/options\/class-amp-analytics-options-submenu.php.html#18\">AMP_Analytics_Options_Submenu::init<\/a>"],[0,1,"<a href=\"includes\/options\/class-amp-analytics-options-submenu.php.html#26\">AMP_Analytics_Options_Submenu::add_submenu<\/a>"],[0,1,"<a href=\"includes\/options\/class-amp-analytics-options-submenu.php.html#37\">AMP_Analytics_Options_Submenu::amp_options_styles<\/a>"],[0,1,"<a href=\"includes\/options\/class-amp-options-menu.php.html#13\">AMP_Options_Menu::__construct<\/a>"],[0,1,"<a href=\"includes\/options\/class-amp-options-menu.php.html#18\">AMP_Options_Menu::init<\/a>"],[0,2,"<a href=\"includes\/options\/class-amp-options-menu.php.html#24\">AMP_Options_Menu::add_menu_items<\/a>"],[0,2,"<a href=\"includes\/options\/class-amp-options-menu.php.html#48\">AMP_Options_Menu::remove_toplevel_menu_item<\/a>"],[0,4,"<a href=\"includes\/options\/views\/class-amp-analytics-options-submenu-page.php.html#7\">AMP_Analytics_Options_Submenu_Page::render_entry<\/a>"],[0,4,"<a href=\"includes\/options\/views\/class-amp-analytics-options-submenu-page.php.html#58\">AMP_Analytics_Options_Submenu_Page::render_title<\/a>"],[0,2,"<a href=\"includes\/options\/views\/class-amp-analytics-options-submenu-page.php.html#89\">AMP_Analytics_Options_Submenu_Page::render<\/a>"],[100,1,"<a href=\"includes\/options\/views\/class-amp-options-manager.php.html#8\">AMP_Options_Manager::get_options<\/a>"],[100,2,"<a href=\"includes\/options\/views\/class-amp-options-manager.php.html#12\">AMP_Options_Manager::get_option<\/a>"],[100,1,"<a href=\"includes\/options\/views\/class-amp-options-manager.php.html#22\">AMP_Options_Manager::update_option<\/a>"],[0,2,"<a href=\"includes\/options\/views\/class-amp-options-manager.php.html#30\">AMP_Options_Manager::handle_analytics_submit<\/a>"],[73.684210526316,7,"<a href=\"includes\/options\/views\/class-amp-options-manager.php.html#46\">AMP_Options_Manager::update_analytics_options<\/a>"],[0,1,"<a href=\"includes\/options\/views\/class-amp-options-menu-page.php.html#4\">AMP_Options_Menu_Page::render<\/a>"],[100,1,"<a href=\"includes\/sanitizers\/class-amp-allowed-tags-generated.php.html#6216\">AMP_Allowed_Tags_Generated::get_allowed_tags<\/a>"],[100,1,"<a href=\"includes\/sanitizers\/class-amp-allowed-tags-generated.php.html#6220\">AMP_Allowed_Tags_Generated::get_allowed_attributes<\/a>"],[100,1,"<a href=\"includes\/sanitizers\/class-amp-allowed-tags-generated.php.html#6224\">AMP_Allowed_Tags_Generated::get_layout_attributes<\/a>"],[100,2,"<a href=\"includes\/sanitizers\/class-amp-audio-sanitizer.php.html#11\">AMP_Audio_Sanitizer::get_scripts<\/a>"],[100,8,"<a href=\"includes\/sanitizers\/class-amp-audio-sanitizer.php.html#19\">AMP_Audio_Sanitizer::sanitize<\/a>"],[100,10,"<a href=\"includes\/sanitizers\/class-amp-audio-sanitizer.php.html#61\">AMP_Audio_Sanitizer::filter_attributes<\/a>"],[100,1,"<a href=\"includes\/sanitizers\/class-amp-base-sanitizer.php.html#12\">AMP_Base_Sanitizer::__construct<\/a>"],[100,1,"<a href=\"includes\/sanitizers\/class-amp-base-sanitizer.php.html#17\">AMP_Base_Sanitizer::sanitize<\/a>"],[100,1,"<a href=\"includes\/sanitizers\/class-amp-base-sanitizer.php.html#19\">AMP_Base_Sanitizer::get_scripts<\/a>"],[100,1,"<a href=\"includes\/sanitizers\/class-amp-base-sanitizer.php.html#23\">AMP_Base_Sanitizer::get_styles<\/a>"],[100,1,"<a href=\"includes\/sanitizers\/class-amp-base-sanitizer.php.html#27\">AMP_Base_Sanitizer::get_body_node<\/a>"],[100,7,"<a href=\"includes\/sanitizers\/class-amp-base-sanitizer.php.html#31\">AMP_Base_Sanitizer::sanitize_dimension<\/a>"],[100,3,"<a href=\"includes\/sanitizers\/class-amp-base-sanitizer.php.html#54\">AMP_Base_Sanitizer::enforce_fixed_height<\/a>"],[100,4,"<a href=\"includes\/sanitizers\/class-amp-base-sanitizer.php.html#75\">AMP_Base_Sanitizer::enforce_sizes_attribute<\/a>"],[100,2,"<a href=\"includes\/sanitizers\/class-amp-base-sanitizer.php.html#92\">AMP_Base_Sanitizer::add_or_append_attribute<\/a>"],[100,7,"<a href=\"includes\/sanitizers\/class-amp-base-sanitizer.php.html#108\">AMP_Base_Sanitizer::maybe_enforce_https_src<\/a>"],[100,1,"<a href=\"includes\/sanitizers\/class-amp-blacklist-sanitizer.php.html#23\">AMP_Blacklist_Sanitizer::sanitize<\/a>"],[100,12,"<a href=\"includes\/sanitizers\/class-amp-blacklist-sanitizer.php.html#33\">AMP_Blacklist_Sanitizer::strip_attributes_recursive<\/a>"],[100,6,"<a href=\"includes\/sanitizers\/class-amp-blacklist-sanitizer.php.html#78\">AMP_Blacklist_Sanitizer::strip_tags<\/a>"],[100,8,"<a href=\"includes\/sanitizers\/class-amp-blacklist-sanitizer.php.html#98\">AMP_Blacklist_Sanitizer::sanitize_a_attribute<\/a>"],[100,8,"<a href=\"includes\/sanitizers\/class-amp-blacklist-sanitizer.php.html#126\">AMP_Blacklist_Sanitizer::validate_a_node<\/a>"],[100,5,"<a href=\"includes\/sanitizers\/class-amp-blacklist-sanitizer.php.html#162\">AMP_Blacklist_Sanitizer::replace_node_with_children<\/a>"],[75,3,"<a href=\"includes\/sanitizers\/class-amp-blacklist-sanitizer.php.html#179\">AMP_Blacklist_Sanitizer::merge_defaults_with_args<\/a>"],[100,1,"<a href=\"includes\/sanitizers\/class-amp-blacklist-sanitizer.php.html#189\">AMP_Blacklist_Sanitizer::get_blacklisted_protocols<\/a>"],[100,1,"<a href=\"includes\/sanitizers\/class-amp-blacklist-sanitizer.php.html#195\">AMP_Blacklist_Sanitizer::get_blacklisted_tags<\/a>"],[100,1,"<a href=\"includes\/sanitizers\/class-amp-blacklist-sanitizer.php.html#229\">AMP_Blacklist_Sanitizer::get_blacklisted_attributes<\/a>"],[100,2,"<a href=\"includes\/sanitizers\/class-amp-iframe-sanitizer.php.html#21\">AMP_Iframe_Sanitizer::get_scripts<\/a>"],[100,7,"<a href=\"includes\/sanitizers\/class-amp-iframe-sanitizer.php.html#29\">AMP_Iframe_Sanitizer::sanitize<\/a>"],[100,15,"<a href=\"includes\/sanitizers\/class-amp-iframe-sanitizer.php.html#80\">AMP_Iframe_Sanitizer::filter_attributes<\/a>"],[100,1,"<a href=\"includes\/sanitizers\/class-amp-iframe-sanitizer.php.html#126\">AMP_Iframe_Sanitizer::build_placeholder<\/a>"],[100,7,"<a href=\"includes\/sanitizers\/class-amp-img-sanitizer.php.html#20\">AMP_Img_Sanitizer::sanitize<\/a>"],[92.307692307692,6,"<a href=\"includes\/sanitizers\/class-amp-img-sanitizer.php.html#57\">AMP_Img_Sanitizer::determine_dimensions<\/a>"],[100,2,"<a href=\"includes\/sanitizers\/class-amp-img-sanitizer.php.html#83\">AMP_Img_Sanitizer::adjust_and_replace_node<\/a>"],[100,3,"<a href=\"includes\/sanitizers\/class-amp-img-sanitizer.php.html#102\">AMP_Img_Sanitizer::adjust_and_replace_nodes_in_array_map<\/a>"],[100,2,"<a href=\"includes\/sanitizers\/class-amp-img-sanitizer.php.html#110\">AMP_Img_Sanitizer::get_scripts<\/a>"],[100,10,"<a href=\"includes\/sanitizers\/class-amp-img-sanitizer.php.html#118\">AMP_Img_Sanitizer::filter_attributes<\/a>"],[100,1,"<a href=\"includes\/sanitizers\/class-amp-img-sanitizer.php.html#145\">AMP_Img_Sanitizer::is_gif_url<\/a>"],[100,2,"<a href=\"includes\/sanitizers\/class-amp-playbuzz-sanitizer.php.html#19\">AMP_Playbuzz_Sanitizer::get_scripts<\/a>"],[93.75,6,"<a href=\"includes\/sanitizers\/class-amp-playbuzz-sanitizer.php.html#29\">AMP_Playbuzz_Sanitizer::sanitize<\/a>"],[100,9,"<a href=\"includes\/sanitizers\/class-amp-playbuzz-sanitizer.php.html#66\">AMP_Playbuzz_Sanitizer::filter_attributes<\/a>"],[100,1,"<a href=\"includes\/sanitizers\/class-amp-style-sanitizer.php.html#11\">AMP_Style_Sanitizer::get_styles<\/a>"],[100,1,"<a href=\"includes\/sanitizers\/class-amp-style-sanitizer.php.html#15\">AMP_Style_Sanitizer::sanitize<\/a>"],[100,7,"<a href=\"includes\/sanitizers\/class-amp-style-sanitizer.php.html#20\">AMP_Style_Sanitizer::collect_styles_recursive<\/a>"],[93.333333333333,6,"<a href=\"includes\/sanitizers\/class-amp-style-sanitizer.php.html#51\">AMP_Style_Sanitizer::process_style<\/a>"],[100,6,"<a href=\"includes\/sanitizers\/class-amp-style-sanitizer.php.html#86\">AMP_Style_Sanitizer::filter_style<\/a>"],[100,1,"<a href=\"includes\/sanitizers\/class-amp-style-sanitizer.php.html#107\">AMP_Style_Sanitizer::generate_class_name<\/a>"],[100,1,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#31\">AMP_Tag_And_Attribute_Sanitizer::__construct<\/a>"],[100,5,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#46\">AMP_Tag_And_Attribute_Sanitizer::sanitize<\/a>"],[100,17,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#76\">AMP_Tag_And_Attribute_Sanitizer::process_node<\/a>"],[100,8,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#177\">AMP_Tag_And_Attribute_Sanitizer::validate_tag_spec_for_node<\/a>"],[100,26,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#205\">AMP_Tag_And_Attribute_Sanitizer::validate_attr_spec_list_for_node<\/a>"],[100,9,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#319\">AMP_Tag_And_Attribute_Sanitizer::sanitize_disallowed_attributes_in_node<\/a>"],[100,2,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#357\">AMP_Tag_And_Attribute_Sanitizer::sanitize_disallowed_attribute_values_in_node<\/a>"],[90.566037735849,30,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#363\">AMP_Tag_And_Attribute_Sanitizer::_sanitize_disallowed_attribute_values_in_node<\/a>"],[100,7,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#450\">AMP_Tag_And_Attribute_Sanitizer::check_attr_spec_rule_mandatory<\/a>"],[100,8,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#481\">AMP_Tag_And_Attribute_Sanitizer::check_attr_spec_rule_value<\/a>"],[100,8,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#514\">AMP_Tag_And_Attribute_Sanitizer::check_attr_spec_rule_value_casei<\/a>"],[100,4,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#551\">AMP_Tag_And_Attribute_Sanitizer::check_attr_spec_rule_value_regex<\/a>"],[100,4,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#579\">AMP_Tag_And_Attribute_Sanitizer::check_attr_spec_rule_value_regex_casei<\/a>"],[100,12,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#603\">AMP_Tag_And_Attribute_Sanitizer::check_attr_spec_rule_allowed_protocol<\/a>"],[100,11,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#652\">AMP_Tag_And_Attribute_Sanitizer::check_attr_spec_rule_disallowed_relative<\/a>"],[100,5,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#701\">AMP_Tag_And_Attribute_Sanitizer::check_attr_spec_rule_disallowed_empty<\/a>"],[100,6,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#724\">AMP_Tag_And_Attribute_Sanitizer::check_attr_spec_rule_disallowed_domain<\/a>"],[100,8,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#752\">AMP_Tag_And_Attribute_Sanitizer::check_attr_spec_rule_blacklisted_value_regex<\/a>"],[100,6,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#781\">AMP_Tag_And_Attribute_Sanitizer::is_amp_allowed_attribute<\/a>"],[100,4,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#799\">AMP_Tag_And_Attribute_Sanitizer::is_amp_allowed_tag<\/a>"],[100,4,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#812\">AMP_Tag_And_Attribute_Sanitizer::has_parent<\/a>"],[100,2,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#823\">AMP_Tag_And_Attribute_Sanitizer::has_ancestor<\/a>"],[100,4,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#834\">AMP_Tag_And_Attribute_Sanitizer::get_ancestor_with_tag_name<\/a>"],[100,4,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#847\">AMP_Tag_And_Attribute_Sanitizer::replace_node_with_children<\/a>"],[100,7,"<a href=\"includes\/sanitizers\/class-amp-tag-and-attribute-sanitizer.php.html#876\">AMP_Tag_And_Attribute_Sanitizer::remove_node<\/a>"],[100,2,"<a href=\"includes\/sanitizers\/class-amp-video-sanitizer.php.html#16\">AMP_Video_Sanitizer::get_scripts<\/a>"],[100,8,"<a href=\"includes\/sanitizers\/class-amp-video-sanitizer.php.html#24\">AMP_Video_Sanitizer::sanitize<\/a>"],[100,13,"<a href=\"includes\/sanitizers\/class-amp-video-sanitizer.php.html#69\">AMP_Video_Sanitizer::filter_attributes<\/a>"],[0,1,"<a href=\"includes\/settings\/class-amp-customizer-design-settings.php.html#8\">AMP_Customizer_Design_Settings::init<\/a>"],[0,1,"<a href=\"includes\/settings\/class-amp-customizer-design-settings.php.html#14\">AMP_Customizer_Design_Settings::init_customizer<\/a>"],[0,1,"<a href=\"includes\/settings\/class-amp-customizer-design-settings.php.html#20\">AMP_Customizer_Design_Settings::register_customizer_settings<\/a>"],[0,1,"<a href=\"includes\/settings\/class-amp-customizer-design-settings.php.html#46\">AMP_Customizer_Design_Settings::register_customizer_ui<\/a>"],[0,1,"<a href=\"includes\/settings\/class-amp-customizer-design-settings.php.html#83\">AMP_Customizer_Design_Settings::enqueue_customizer_preview_scripts<\/a>"],[100,1,"<a href=\"includes\/settings\/class-amp-customizer-design-settings.php.html#96\">AMP_Customizer_Design_Settings::append_settings<\/a>"],[0,1,"<a href=\"includes\/settings\/class-amp-customizer-design-settings.php.html#110\">AMP_Customizer_Design_Settings::get_color_scheme_names<\/a>"],[100,1,"<a href=\"includes\/settings\/class-amp-customizer-design-settings.php.html#117\">AMP_Customizer_Design_Settings::get_color_schemes<\/a>"],[75,2,"<a href=\"includes\/settings\/class-amp-customizer-design-settings.php.html#136\">AMP_Customizer_Design_Settings::get_colors_for_color_scheme<\/a>"],[0,2,"<a href=\"includes\/settings\/class-amp-customizer-design-settings.php.html#146\">AMP_Customizer_Design_Settings::sanitize_color_scheme<\/a>"],[100,1,"<a href=\"includes\/settings\/class-amp-customizer-settings.php.html#4\">AMP_Customizer_Settings::get_stored_options<\/a>"],[100,1,"<a href=\"includes\/settings\/class-amp-customizer-settings.php.html#8\">AMP_Customizer_Settings::get_settings<\/a>"],[87.5,2,"<a href=\"includes\/utils\/class-amp-dom-utils.php.html#4\">AMP_DOM_Utils::get_dom_from_content<\/a>"],[100,2,"<a href=\"includes\/utils\/class-amp-dom-utils.php.html#24\">AMP_DOM_Utils::get_content_from_dom<\/a>"],[100,1,"<a href=\"includes\/utils\/class-amp-dom-utils.php.html#40\">AMP_DOM_Utils::create_node<\/a>"],[83.333333333333,3,"<a href=\"includes\/utils\/class-amp-dom-utils.php.html#46\">AMP_DOM_Utils::get_node_attributes_as_assoc_array<\/a>"],[100,2,"<a href=\"includes\/utils\/class-amp-dom-utils.php.html#58\">AMP_DOM_Utils::add_attributes_to_node<\/a>"],[100,2,"<a href=\"includes\/utils\/class-amp-dom-utils.php.html#64\">AMP_DOM_Utils::is_node_empty<\/a>"],[100,5,"<a href=\"includes\/utils\/class-amp-dom-utils.php.html#69\">AMP_DOM_Utils::recursive_force_closing_tags<\/a>"],[100,2,"<a href=\"includes\/utils\/class-amp-dom-utils.php.html#91\">AMP_DOM_Utils::is_self_closing_tag<\/a>"],[100,1,"<a href=\"includes\/utils\/class-amp-html-utils.php.html#4\">AMP_HTML_Utils::build_tag<\/a>"],[83.333333333333,3,"<a href=\"includes\/utils\/class-amp-html-utils.php.html#9\">AMP_HTML_Utils::build_attributes_string<\/a>"],[66.666666666667,3,"<a href=\"includes\/utils\/class-amp-html-utils.php.html#21\">AMP_HTML_Utils::is_valid_json<\/a>"],[100,5,"<a href=\"includes\/utils\/class-amp-image-dimension-extractor.php.html#8\">AMP_Image_Dimension_Extractor::extract<\/a>"],[100,7,"<a href=\"includes\/utils\/class-amp-image-dimension-extractor.php.html#41\">AMP_Image_Dimension_Extractor::normalize_url<\/a>"],[100,1,"<a href=\"includes\/utils\/class-amp-image-dimension-extractor.php.html#69\">AMP_Image_Dimension_Extractor::register_callbacks<\/a>"],[100,1,"<a href=\"includes\/utils\/class-amp-image-dimension-extractor.php.html#84\">AMP_Image_Dimension_Extractor::extract_by_downloading_images<\/a>"],[62.5,6,"<a href=\"includes\/utils\/class-amp-image-dimension-extractor.php.html#105\">AMP_Image_Dimension_Extractor::determine_which_images_to_fetch<\/a>"],[100,4,"<a href=\"includes\/utils\/class-amp-image-dimension-extractor.php.html#156\">AMP_Image_Dimension_Extractor::fetch_images<\/a>"],[100,4,"<a href=\"includes\/utils\/class-amp-image-dimension-extractor.php.html#174\">AMP_Image_Dimension_Extractor::fetch_images_via_fast_image<\/a>"],[100,2,"<a href=\"includes\/utils\/class-amp-image-dimension-extractor.php.html#199\">AMP_Image_Dimension_Extractor::fetch_images_via_faster_image<\/a>"],[100,3,"<a href=\"includes\/utils\/class-amp-image-dimension-extractor.php.html#220\">AMP_Image_Dimension_Extractor::process_fetched_images<\/a>"],[100,1,"<a href=\"includes\/utils\/class-amp-image-dimension-extractor.php.html#250\">AMP_Image_Dimension_Extractor::get_default_user_agent<\/a>"],[100,3,"<a href=\"includes\/utils\/class-amp-string-utils.php.html#4\">AMP_String_Utils::endswith<\/a>"],[75,3,"<a href=\"includes\/utils\/class-amp-wp-utils.php.html#9\">AMP_WP_Utils::parse_url<\/a>"],[0,5,"<a href=\"includes\/utils\/class-amp-wp-utils.php.html#25\">AMP_WP_Utils::_get_component_from_parsed_url_array<\/a>"],[0,2,"<a href=\"includes\/utils\/class-amp-wp-utils.php.html#43\">AMP_WP_Utils::_wp_translate_php_url_constant_to_key<\/a>"],[0,1,"<a href=\"wpcom\/class-amp-polldaddy-embed.php.html#4\">WPCOM_AMP_Polldaddy_Embed::register_embed<\/a>"],[0,1,"<a href=\"wpcom\/class-amp-polldaddy-embed.php.html#8\">WPCOM_AMP_Polldaddy_Embed::unregister_embed<\/a>"],[0,5,"<a href=\"wpcom\/class-amp-polldaddy-embed.php.html#12\">WPCOM_AMP_Polldaddy_Embed::shortcode<\/a>"]], 'Method Complexity'))
+      .transition()
+      .duration(500)
+      .call(chart);
+
+    nv.utils.windowResize(chart.update);
+
+    return chart;
+  });
+
+  function getComplexityData(data, label) {
+    var values = [];
+    $.each(data, function(key) {
+      var value = Math.round(data[key][0]*100) / 100;
+      values.push({
+        x: value,
+        y: data[key][1],
+        class: data[key][2],
+        size: 0.05,
+        shape: 'diamond'
+      });
+    });
+
+    return [
+      {
+        key: label,
+        values: values,
+        color: "#4572A7"
+      }
+    ];
+  }
+});
+  </script>
+ </body>
+</html>
