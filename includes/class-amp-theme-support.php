@@ -662,10 +662,12 @@ class AMP_Theme_Support {
 			 * @var WP_Post $queried_object
 			 */
 			$queried_object = $query->get_queried_object();
-			$support_errors = AMP_Post_Type_Support::get_support_errors( $queried_object );
-			if ( ! empty( $support_errors ) ) {
-				$matching_template['errors']    = array_merge( $matching_template['errors'], $support_errors );
-				$matching_template['supported'] = false;
+			if ( $queried_object instanceof WP_Post ) {
+				$support_errors = AMP_Post_Type_Support::get_support_errors( $queried_object );
+				if ( ! empty( $support_errors ) ) {
+					$matching_template['errors']    = array_merge( $matching_template['errors'], $support_errors );
+					$matching_template['supported'] = false;
+				}
 			}
 		}
 
@@ -1251,6 +1253,8 @@ class AMP_Theme_Support {
 		 * @var DOMElement $link
 		 */
 
+		$xpath = new DOMXPath( $dom );
+
 		// Make sure the HEAD element is in the doc.
 		$head = $dom->getElementsByTagName( 'head' )->item( 0 );
 		if ( ! $head ) {
@@ -1258,14 +1262,9 @@ class AMP_Theme_Support {
 			$dom->documentElement->insertBefore( $head, $dom->documentElement->firstChild );
 		}
 
-		// Ensure there is a schema.org script.
-		$schema_org_meta_script = null;
-		foreach ( $head->getElementsByTagName( 'script' ) as $script ) {
-			if ( 'application/ld+json' === $script->getAttribute( 'type' ) && false !== strpos( $script->nodeValue, 'schema.org' ) ) {
-				$schema_org_meta_script = $script;
-				break;
-			}
-		}
+		// Ensure there is a schema.org script in the document.
+		// @todo Consider applying the amp_schemaorg_metadata filter on the contents when a script is already present.
+		$schema_org_meta_script = $xpath->query( '//script[ @type = "application/ld+json" ][ contains( ./text(), "schema.org" ) ]' )->item( 0 );
 		if ( ! $schema_org_meta_script ) {
 			$script = $dom->createElement( 'script' );
 			$script->setAttribute( 'type', 'application/ld+json' );
@@ -1326,7 +1325,7 @@ class AMP_Theme_Support {
 		if ( ! $meta_viewport ) {
 			$meta_viewport = AMP_DOM_Utils::create_node( $dom, 'meta', array(
 				'name'    => 'viewport',
-				'content' => 'width=device-width,minimum-scale=1',
+				'content' => 'width=device-width',
 			) );
 		} else {
 			$head->removeChild( $meta_viewport ); // So we can move it.
@@ -1939,7 +1938,7 @@ class AMP_Theme_Support {
 			}
 		}
 
-		// Ensure the mandatory amp attribute is present on the html element, as otherwise it will be stripped entirely.
+		// Ensure the mandatory amp attribute is present on the html element.
 		if ( ! $dom->documentElement->hasAttribute( 'amp' ) && ! $dom->documentElement->hasAttribute( '⚡️' ) ) {
 			$dom->documentElement->setAttribute( 'amp', '' );
 		}
