@@ -77,6 +77,9 @@ class AMP_Editor_Blocks {
 		}
 
 		foreach ( $tags as &$tag ) {
+			if ( ! is_array( $tag ) ) {
+				continue;
+			}
 			$tag['data-amp-layout']              = true;
 			$tag['data-amp-noloading']           = true;
 			$tag['data-amp-lightbox']            = true;
@@ -132,6 +135,7 @@ class AMP_Editor_Blocks {
 				AMP__VERSION
 			);
 
+			// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.NotInFooter
 			wp_enqueue_script(
 				'amp-editor-blocks-build',
 				amp_get_asset_url( 'js/amp-blocks-compiled.js' ),
@@ -154,9 +158,14 @@ class AMP_Editor_Blocks {
 
 		wp_add_inline_script(
 			'amp-editor-blocks',
-			sprintf( 'ampEditorBlocks.boot( %s );', wp_json_encode( array(
-				'hasThemeSupport' => current_theme_supports( AMP_Theme_Support::SLUG ),
-			) ) )
+			sprintf(
+				'ampEditorBlocks.boot( %s );',
+				wp_json_encode(
+					array(
+						'hasThemeSupport' => current_theme_supports( AMP_Theme_Support::SLUG ),
+					)
+				)
+			)
 		);
 
 		if ( function_exists( 'wp_set_script_translations' ) ) {
