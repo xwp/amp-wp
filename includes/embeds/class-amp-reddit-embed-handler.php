@@ -67,7 +67,7 @@ class AMP_Reddit_Embed_Handler extends AMP_Base_Embed_Handler {
 				'layout'   => 'responsive',
 				'width'    => '100',
 				'height'   => '100',
-				'data-url' => $args['url']
+				'data-url' => $args['url'],
 			)
 		);
 	}
