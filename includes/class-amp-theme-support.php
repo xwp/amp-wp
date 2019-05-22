@@ -1715,7 +1715,7 @@ class AMP_Theme_Support {
 	 */
 	public static function finish_output_buffering( $response ) {
 		self::$is_output_buffering = false;
-		return self::prepare_response( $response );
+		return apply_filters( 'nova_amp_document_output', self::prepare_response( $response ) );
 	}
 
 	/**
