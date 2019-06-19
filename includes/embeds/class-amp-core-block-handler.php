@@ -20,6 +20,7 @@ class AMP_Core_Block_Handler extends AMP_Base_Embed_Handler {
 	protected $block_ampify_methods = array(
 		'core/categories' => 'ampify_categories_block',
 		'core/archives'   => 'ampify_archives_block',
+		'core/video'      => 'ampify_video_block',
 	);
 
 	/**
@@ -44,11 +45,25 @@ class AMP_Core_Block_Handler extends AMP_Base_Embed_Handler {
 	 * @return string Filtered block content.
 	 */
 	public function filter_rendered_block( $block_content, $block ) {
-		if ( isset( $block['blockName'] ) && isset( $this->block_ampify_methods[ $block['blockName'] ] ) ) {
+		if ( ! isset( $block['blockName'] ) ) {
+			return $block_content;
+		}
+		if ( isset( $this->block_ampify_methods[ $block['blockName'] ] ) ) {
 			$block_content = call_user_func(
 				array( $this, $this->block_ampify_methods[ $block['blockName'] ] ),
-				$block_content
+				$block_content,
+				$block
 			);
+		} elseif ( 'core/image' === $block['blockName'] || 'core/audio' === $block['blockName'] ) {
+			/*
+			 * While the video block placeholder just outputs an empty video element, the placeholders for image and
+			 * audio blocks output empty <img> and <audio> respectively. These will result in AMP validation errors,
+			 * so we need to empty out the block content to prevent this from happening. Note that <source> is used
+			 * for <img> because eventually the image block could use <picture>.
+			 */
+			if ( ! preg_match( '/src=|<source/', $block_content ) ) {
+				$block_content = '';
+			}
 		}
 		return $block_content;
 	}
@@ -115,4 +130,32 @@ class AMP_Core_Block_Handler extends AMP_Base_Embed_Handler {
 		return $block_content;
 	}
 
+	/**
+	 * Ampify video block.
+	 *
+	 * Inject the video attachment's dimensions if available. This prevents having to try to look up the attachment
+	 * post by the video URL in `\AMP_Video_Sanitizer::filter_video_dimensions()`.
+	 *
+	 * @see \AMP_Video_Sanitizer::filter_video_dimensions()
+	 *
+	 * @param string $block_content The block content about to be appended.
+	 * @param array  $block         The full block, including name and attributes.
+	 * @return string Filtered block content.
+	 */
+	public function ampify_video_block( $block_content, $block ) {
+		if ( empty( $block['attrs']['id'] ) || 'attachment' !== get_post_type( $block['attrs']['id'] ) ) {
+			return $block_content;
+		}
+
+		$meta_data = wp_get_attachment_metadata( $block['attrs']['id'] );
+		if ( isset( $meta_data['width'] ) && isset( $meta_data['height'] ) ) {
+			$block_content = preg_replace(
+				'/(?<=<video\s)/',
+				sprintf( 'width="%d" height="%d" ', $meta_data['width'], $meta_data['height'] ),
+				$block_content
+			);
+		}
+
+		return $block_content;
+	}
 }

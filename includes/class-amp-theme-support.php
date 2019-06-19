@@ -189,7 +189,7 @@ class AMP_Theme_Support {
 			$args = self::get_theme_support_args();
 
 			// Validate theme support usage.
-			$keys = array( 'template_dir', 'comments_live_list', 'paired', 'templates_supported', 'available_callback', 'nav_menu_toggle', 'nav_menu_dropdown', 'app_shell' );
+			$keys = array( 'template_dir', 'comments_live_list', 'paired', 'templates_supported', 'available_callback', 'service_worker', 'nav_menu_toggle', 'nav_menu_dropdown', 'app_shell' );
 
 			if ( count( array_diff( array_keys( $args ), $keys ) ) !== 0 ) {
 				_doing_it_wrong(
@@ -266,11 +266,11 @@ class AMP_Theme_Support {
 		if ( ! is_amp_endpoint() ) {
 			/*
 			 * Redirect to AMP-less variable if AMP is not available for this URL and yet the query var is present.
-			 * Temporary redirect is used for admin users because implied paired mode and template support can be
+			 * Temporary redirect is used for admin users because implied transitional mode and template support can be
 			 * enabled by user ay any time, so they will be able to make AMP available for this URL and see the change
 			 * without wrestling with the redirect cache.
 			 */
-			if ( isset( $_GET[ amp_get_slug() ] ) ) { // phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+			if ( isset( $_GET[ amp_get_slug() ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				self::redirect_non_amp_url( current_user_can( 'manage_options' ) ? 302 : 301, true );
 			}
 
@@ -387,8 +387,8 @@ class AMP_Theme_Support {
 			}
 		} else {
 			/*
-			 * When in AMP paired mode *with* theme support, then the proper AMP URL has the 'amp' URL param
-			 * and not the /amp/ endpoint. The URL param is now the exclusive way to mark AMP in paired mode
+			 * When in AMP transitional mode *with* theme support, then the proper AMP URL has the 'amp' URL param
+			 * and not the /amp/ endpoint. The URL param is now the exclusive way to mark AMP in transitional mode
 			 * when amp theme support present. This is important for plugins to be able to reliably call
 			 * is_amp_endpoint() before the parse_query action.
 			 */
@@ -396,7 +396,7 @@ class AMP_Theme_Support {
 				$old_url = amp_get_current_url();
 				$new_url = add_query_arg( amp_get_slug(), '', amp_remove_endpoint( $old_url ) );
 				if ( $old_url !== $new_url ) {
-					// A temporary redirect is used for admin users to allow them to see changes between classic and paired modes.
+					// A temporary redirect is used for admin users to allow them to see changes between reader mode and transitional modes.
 					wp_safe_redirect( $new_url, current_user_can( 'manage_options' ) ? 302 : 301 );
 					// @codeCoverageIgnoreStart
 					if ( $exit ) {
@@ -440,7 +440,7 @@ class AMP_Theme_Support {
 	}
 
 	/**
-	 * Determines whether paired mode is available.
+	 * Determines whether transitional mode is available.
 	 *
 	 * When 'amp' theme support has not been added or canonical mode is enabled, then this returns false.
 	 *
@@ -995,7 +995,7 @@ class AMP_Theme_Support {
 		);
 
 		add_action( 'wp_head', 'amp_add_generator_metadata', 20 );
-		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_assets' ) );
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_assets' ), 0 ); // Enqueue before theme's styles.
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'dequeue_customize_preview_scripts' ), 1000 );
 		add_filter( 'customize_partial_render', array( __CLASS__, 'filter_customize_partial_render' ) );
 
@@ -1157,7 +1157,7 @@ class AMP_Theme_Support {
 	}
 
 	/**
-	 * Prepends template hierarchy with template_dir for AMP paired mode templates.
+	 * Prepends template hierarchy with template_dir for AMP transitional mode templates.
 	 *
 	 * @param array $templates Template hierarchy.
 	 * @return array Templates.
@@ -1249,9 +1249,9 @@ class AMP_Theme_Support {
 			str_replace(
 				'%s',
 				sprintf( '" + %s.replyToName + "', $state_id ),
-				wp_json_encode( $args['title_reply_to'] )
+				wp_json_encode( $args['title_reply_to'], JSON_UNESCAPED_UNICODE )
 			),
-			wp_json_encode( $args['title_reply'] )
+			wp_json_encode( $args['title_reply'], JSON_UNESCAPED_UNICODE )
 		);
 
 		$args['title_reply_before'] .= sprintf(
@@ -1334,7 +1334,7 @@ class AMP_Theme_Support {
 			esc_url( remove_query_arg( 'replytocom' ) . '#' . $respond_id ),
 			isset( $_GET['replytocom'] ) ? '' : ' hidden', // phpcs:ignore
 			esc_attr( sprintf( '%s.values.comment_parent == "0"', self::get_comment_form_state_id( get_the_ID() ) ) ),
-			esc_attr( sprintf( 'tap:AMP.setState( %s )', wp_json_encode( $tap_state ) ) ),
+			esc_attr( sprintf( 'tap:AMP.setState( %s )', wp_json_encode( $tap_state, JSON_UNESCAPED_UNICODE ) ) ),
 			esc_html( $text )
 		);
 	}
@@ -1416,7 +1416,7 @@ class AMP_Theme_Support {
 		if ( ! $schema_org_meta_script ) {
 			$script = $dom->createElement( 'script' );
 			$script->setAttribute( 'type', 'application/ld+json' );
-			$script->appendChild( $dom->createTextNode( wp_json_encode( amp_get_schemaorg_metadata() ) ) );
+			$script->appendChild( $dom->createTextNode( wp_json_encode( amp_get_schemaorg_metadata(), JSON_UNESCAPED_UNICODE ) ) );
 			$head->appendChild( $script );
 		}
 
@@ -1904,38 +1904,55 @@ class AMP_Theme_Support {
 			$stream_fragment = WP_Service_Worker_Navigation_Routing_Component::get_stream_fragment_query_var();
 		}
 
+		/**
+		 * Filters whether response (post-processor) caching is enabled.
+		 *
+		 * When enabled and when an external object cache is present, the output of the post-processor phase is stored in
+		 * in the object cache. When another request is made that generates the same HTML output, the previously-cached
+		 * post-processor output will then be served immediately and bypass needlessly re-running the sanitizers.
+		 * This does not apply when:
+		 *
+		 * - AMP validation is being performed.
+		 * - The response is in the Customizer preview.
+		 * - Response caching is disabled due to a high-rate of cache misses.
+		 *
+		 * @param bool $enable_response_caching Whether response caching is enabled.
+		 */
+		$enable_response_caching = apply_filters( 'amp_response_caching_enabled', ! ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || ! empty( $args['enable_response_caching'] ) );
+		$enable_response_caching = (
+			$enable_response_caching
+			&&
+			! AMP_Validation_Manager::should_validate_response()
+			&&
+			! is_customize_preview()
+		);
+
+		// When response caching is enabled, determine if it should be turned off for cache misses.
+		$caches_for_url = null;
+		if ( $enable_response_caching ) {
+			list( $disable_response_caching, $caches_for_url ) = self::check_for_cache_misses();
+			$enable_response_caching                           = ! $disable_response_caching;
+		}
+
 		// Get request for shadow DOM.
 		$app_shell_component = self::get_requested_app_shell_component();
 
 		$args = array_merge(
 			array(
-				'content_max_width'       => ! empty( $content_width ) ? $content_width : AMP_Post_Template::CONTENT_MAX_WIDTH, // Back-compat.
-				'use_document_element'    => true,
-				'allow_dirty_styles'      => self::is_customize_preview_iframe(), // Dirty styles only needed when editing (e.g. for edit shortcodes).
-				'allow_dirty_scripts'     => is_customize_preview(), // Scripts are always needed to inject changeset UUID.
-				'enable_response_caching' => (
-					! ( defined( 'WP_DEBUG' ) && WP_DEBUG )
-					&&
-					! AMP_Validation_Manager::should_validate_response()
-					&&
-					! is_customize_preview()
-				),
-				'user_can_validate'       => AMP_Validation_Manager::has_cap(),
-				'stream_fragment'         => $stream_fragment,
+				'content_max_width'    => ! empty( $content_width ) ? $content_width : AMP_Post_Template::CONTENT_MAX_WIDTH, // Back-compat.
+				'use_document_element' => true,
+				'allow_dirty_styles'   => self::is_customize_preview_iframe(), // Dirty styles only needed when editing (e.g. for edit shortcodes).
+				'allow_dirty_scripts'  => is_customize_preview(), // Scripts are always needed to inject changeset UUID.
+				'user_can_validate'    => AMP_Validation_Manager::has_cap(),
+				'stream_fragment'      => $stream_fragment,
 				'app_shell_component'     => $app_shell_component,
 			),
-			$args
+			$args,
+			compact( 'enable_response_caching' )
 		);
 
 		$current_url = amp_get_current_url();
 		$non_amp_url = amp_remove_endpoint( $current_url );
-
-		// When response caching is enabled, determine if it should be turned off for cache misses.
-		$caches_for_url = null;
-		if ( true === $args['enable_response_caching'] ) {
-			list( $disable_response_caching, $caches_for_url ) = self::check_for_cache_misses();
-			$args['enable_response_caching']                   = ! $disable_response_caching;
-		}
 
 		/*
 		 * Set response cache hash, the data values dictates whether a new hash key should be generated or not.

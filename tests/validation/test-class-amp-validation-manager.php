@@ -128,7 +128,7 @@ class Test_AMP_Validation_Manager extends \WP_UnitTestCase {
 		$this->assertEquals( 10, has_action( 'rest_api_init', self::TESTED_CLASS . '::add_rest_api_fields' ) );
 
 		$this->assertContains( AMP_Validation_Manager::VALIDATION_ERRORS_QUERY_VAR, wp_removable_query_args() );
-		$this->assertEquals( 100, has_action( 'admin_bar_menu', array( self::TESTED_CLASS, 'add_admin_bar_menu_items' ) ) );
+		$this->assertEquals( 101, has_action( 'admin_bar_menu', array( self::TESTED_CLASS, 'add_admin_bar_menu_items' ) ) );
 
 		$this->assertFalse( has_action( 'wp', array( self::TESTED_CLASS, 'wrap_widget_callbacks' ) ) );
 		$this->assertEquals( 10, has_filter( 'amp_validation_error_sanitized', array( self::TESTED_CLASS, 'filter_tree_shaking_validation_error_as_accepted' ) ) );
@@ -603,7 +603,7 @@ class Test_AMP_Validation_Manager extends \WP_UnitTestCase {
 		AMP_Validation_Manager::print_edit_form_validation_status( $post );
 		$output = ob_get_clean();
 
-		// In 'Paired' mode with 'auto_accept_sanitization' set to false.
+		// In 'Transitional' mode with 'auto_accept_sanitization' set to false.
 		$expected_notice_non_accepted_errors = 'There is content which fails AMP validation. Non-accepted validation errors prevent AMP from being served, and the user will be redirected to the non-AMP version.';
 		$this->assertContains( 'notice notice-warning', $output );
 		$this->assertContains( '<code>script</code>', $output );
@@ -709,6 +709,11 @@ class Test_AMP_Validation_Manager extends \WP_UnitTestCase {
 	 * @return array
 	 */
 	public function get_block_data() {
+		$latest_posts_block = WP_Block_Type_Registry::get_instance()->get_registered( 'core/latest-posts' );
+
+		$reflection_function = new ReflectionFunction( $latest_posts_block->render_callback );
+		$is_gutenberg = false !== strpos( $reflection_function->getFileName(), 'gutenberg' );
+
 		return array(
 			'paragraph'    => array(
 				"<!-- wp:paragraph -->\n<p>Latest posts:</p>\n<!-- /wp:paragraph -->",
@@ -721,9 +726,10 @@ class Test_AMP_Validation_Manager extends \WP_UnitTestCase {
 			'latest_posts' => array(
 				'<!-- wp:latest-posts {"postsToShow":1,"categories":""} /-->',
 				sprintf(
-					'<!--amp-source-stack {"block_name":"core\/latest-posts","post_id":{{post_id}},"block_content_index":0,"block_attrs":{"postsToShow":1,"categories":""},"type":"%1$s","name":"%2$s","function":"render_block_core_latest_posts"}--><ul class="wp-block-latest-posts"><li><a href="{{url}}">{{title}}</a></li></ul><!--/amp-source-stack {"block_name":"core\/latest-posts","post_id":{{post_id}},"block_attrs":{"postsToShow":1,"categories":""},"type":"%1$s","name":"%2$s","function":"render_block_core_latest_posts"}-->',
-					version_compare( get_bloginfo( 'version' ), '5.0', '<' ) ? 'plugin' : 'core',
-					version_compare( get_bloginfo( 'version' ), '5.0', '<' ) ? 'gutenberg' : 'wp-includes'
+					'<!--amp-source-stack {"block_name":"core\/latest-posts","post_id":{{post_id}},"block_content_index":0,"block_attrs":{"postsToShow":1,"categories":""},"type":"%1$s","name":"%2$s","function":"%3$s"}--><ul class="wp-block-latest-posts wp-block-latest-posts__list"><li><a href="{{url}}">{{title}}</a></li></ul><!--/amp-source-stack {"block_name":"core\/latest-posts","post_id":{{post_id}},"block_attrs":{"postsToShow":1,"categories":""},"type":"%1$s","name":"%2$s","function":"%3$s"}-->',
+					$is_gutenberg ? 'plugin' : 'core',
+					$is_gutenberg ? 'gutenberg' : 'wp-includes',
+					$latest_posts_block->render_callback
 				),
 				array(
 					'element' => 'ul',
@@ -782,6 +788,14 @@ class Test_AMP_Validation_Manager extends \WP_UnitTestCase {
 			),
 			$expected
 		);
+
+		// Temporary patch to support running unit tests in Gutenberg<5.7.0.
+		$rendered_block = str_replace(
+			'class="wp-block-latest-posts"',
+			'class="wp-block-latest-posts wp-block-latest-posts__list"',
+			$rendered_block
+		);
+
 		$this->assertEquals(
 			preg_replace( '/(?<=>)\s+(?=<)/', '', str_replace( '%d', $post->ID, $expected ) ),
 			preg_replace( '/(?<=>)\s+(?=<)/', '', $rendered_block )
@@ -856,7 +870,7 @@ class Test_AMP_Validation_Manager extends \WP_UnitTestCase {
 
 		AMP_Validation_Manager::add_validation_error_sourcing();
 
-		add_action( $action_function_callback, '_amp_print_php_version_admin_notice' );
+		add_action( $action_function_callback, '_amp_show_load_errors_admin_notice' );
 		add_action( $action_no_argument, array( $this, 'output_div' ) );
 		add_action( $action_one_argument, array( $this, 'output_notice' ) );
 		add_action( $action_two_arguments, array( $this, 'output_message' ), 10, 2 );

@@ -376,6 +376,16 @@ class Test_AMP_Validated_URL_Post_Type extends \WP_UnitTestCase {
 				),
 			),
 			array(
+				'code'    => 'rejected',
+				'evil'    => '<script>document.write( \'<a href="#" target="_blank" rel="noopener noreferrer">test</a>\' );</script>', // Test protection against wp_targeted_link_rel JSON corruption.
+				'sources' => array(
+					array(
+						'type' => 'theme',
+						'name' => 'twentyseventeen',
+					),
+				),
+			),
+			array(
 				'code'    => 'new',
 				'sources' => array(
 					array(
@@ -450,6 +460,7 @@ class Test_AMP_Validated_URL_Post_Type extends \WP_UnitTestCase {
 
 		$error_groups = array(
 			AMP_Validation_Error_Taxonomy::VALIDATION_ERROR_ACK_ACCEPTED_STATUS,
+			AMP_Validation_Error_Taxonomy::VALIDATION_ERROR_ACK_REJECTED_STATUS,
 			AMP_Validation_Error_Taxonomy::VALIDATION_ERROR_ACK_REJECTED_STATUS,
 			AMP_Validation_Error_Taxonomy::VALIDATION_ERROR_NEW_ACCEPTED_STATUS,
 		);
@@ -934,7 +945,7 @@ class Test_AMP_Validated_URL_Post_Type extends \WP_UnitTestCase {
 			'/edit.php?post_type=amp_validated_url&amp_validate_error=missing_url&amp_urls_tested=0',
 			$exception->getMessage()
 		);
-		unset( $_GET['post'] );
+		unset( $_GET['post'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		// Test validating for a non-valid post.
 		$_GET['post'] = 1234567890;
@@ -945,7 +956,7 @@ class Test_AMP_Validated_URL_Post_Type extends \WP_UnitTestCase {
 			'/edit.php?post_type=amp_validated_url&amp_validate_error=invalid_post&amp_urls_tested=0',
 			$exception->getMessage()
 		);
-		unset( $_GET['post'] );
+		unset( $_GET['post'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		// Test validating for a non-valid post type.
 		$_GET['post'] = $this->factory()->post->create();
@@ -956,7 +967,7 @@ class Test_AMP_Validated_URL_Post_Type extends \WP_UnitTestCase {
 			'/edit.php?post_type=amp_validated_url&amp_validate_error=invalid_post&amp_urls_tested=0',
 			$exception->getMessage()
 		);
-		unset( $_GET['post'] );
+		unset( $_GET['post'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		// Verify that redirect is happening for a successful case.
 		$_GET['post'] = $post_id;
@@ -967,7 +978,7 @@ class Test_AMP_Validated_URL_Post_Type extends \WP_UnitTestCase {
 			sprintf( 'post.php?post=%s&action=edit&amp_urls_tested=1&amp_remaining_errors=2', $post_id ),
 			$exception->getMessage()
 		);
-		unset( $_GET['post'] );
+		unset( $_GET['post'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		// Test validating by URL.
 		$_GET['url'] = home_url( '/' );

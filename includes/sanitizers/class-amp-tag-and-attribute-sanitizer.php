@@ -1854,7 +1854,7 @@ class AMP_Tag_And_Attribute_Sanitizer extends AMP_Base_Sanitizer {
 		}
 
 		// If the first element is not of the required type, invalidate the entire element.
-		if ( isset( $child_tags['first_child_tag_name_oneof'] ) && ( empty( $child_elements[0] ) || ! in_array( $child_elements[0]->nodeName, $child_tags['first_child_tag_name_oneof'], true ) ) ) {
+		if ( isset( $child_tags['first_child_tag_name_oneof'] ) && ! empty( $child_elements[0] ) && ! in_array( $child_elements[0]->nodeName, $child_tags['first_child_tag_name_oneof'], true ) ) {
 			return false;
 		}
 
@@ -1986,7 +1986,9 @@ class AMP_Tag_And_Attribute_Sanitizer extends AMP_Base_Sanitizer {
 		if ( $node && $parent ) {
 			$this->remove_invalid_child( $node );
 		}
-		while ( $parent && ! $parent->hasChildNodes() && $this->root_element !== $parent ) {
+
+		// @todo Does this parent removal even make sense anymore?
+		while ( $parent && ! $parent->hasChildNodes() && ! $parent->hasAttributes() && $this->root_element !== $parent ) {
 			$node   = $parent;
 			$parent = $parent->parentNode;
 			if ( $parent ) {

@@ -122,7 +122,7 @@ class Test_AMP_Helper_Functions extends WP_UnitTestCase {
 		$this->assertContains( 'current_filter=amp_get_permalink', $url );
 		remove_filter( 'amp_pre_get_permalink', array( $this, 'return_example_url' ) );
 
-		// Now check with theme support added (in paired mode).
+		// Now check with theme support added (in transitional mode).
 		add_theme_support( AMP_Theme_Support::SLUG, array( 'template_dir' => './' ) );
 		$this->assertStringEndsWith( '&amp', amp_get_permalink( $published_post ) );
 		$this->assertStringEndsWith( '&amp', amp_get_permalink( $drafted_post ) );
@@ -187,7 +187,7 @@ class Test_AMP_Helper_Functions extends WP_UnitTestCase {
 		$this->assertContains( 'current_filter=amp_get_permalink', $url );
 		remove_filter( 'amp_get_permalink', array( $this, 'return_example_url' ), 10 );
 
-		// Now check with theme support added (in paired mode).
+		// Now check with theme support added (in transitional mode).
 		add_theme_support( AMP_Theme_Support::SLUG, array( 'template_dir' => './' ) );
 		$this->assertStringEndsWith( '&amp', amp_get_permalink( $drafted_post ) );
 		$this->assertStringEndsWith( '?amp', amp_get_permalink( $published_post ) );
@@ -203,7 +203,7 @@ class Test_AMP_Helper_Functions extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test amp_get_permalink() with theme support paired mode.
+	 * Test amp_get_permalink() with theme support transitional mode.
 	 *
 	 * @covers \amp_get_permalink()
 	 */
@@ -344,11 +344,11 @@ class Test_AMP_Helper_Functions extends WP_UnitTestCase {
 		unset( $GLOBALS['wp_query']->query_vars[ amp_get_slug() ] );
 		$this->assertFalse( is_amp_endpoint() );
 
-		// Paired theme support.
+		// Transitional theme support.
 		add_theme_support( AMP_Theme_Support::SLUG, array( 'template_dir' => './' ) );
 		$_GET['amp'] = '';
 		$this->assertTrue( is_amp_endpoint() );
-		unset( $_GET['amp'] );
+		unset( $_GET['amp'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$this->assertFalse( is_amp_endpoint() );
 		remove_theme_support( AMP_Theme_Support::SLUG );
 
@@ -402,6 +402,13 @@ class Test_AMP_Helper_Functions extends WP_UnitTestCase {
 
 		$this->go_to( home_url( '?feed=rss' ) );
 		$this->assertFalse( is_amp_endpoint() );
+
+		if ( class_exists( 'WP_Service_Workers' ) && defined( 'WP_Service_Workers::QUERY_VAR' ) && function_exists( 'pwa_add_error_template_query_var' ) ) {
+			$this->go_to( home_url( "?p=$post_id" ) );
+			global $wp_query;
+			$wp_query->set( WP_Service_Workers::QUERY_VAR, WP_Service_Workers::SCOPE_FRONT );
+			$this->assertFalse( is_amp_endpoint() );
+		}
 	}
 
 	/**
@@ -474,14 +481,14 @@ class Test_AMP_Helper_Functions extends WP_UnitTestCase {
 		ob_start();
 		amp_add_generator_metadata();
 		$output = ob_get_clean();
-		$this->assertContains( 'mode=classic', $output );
+		$this->assertContains( 'mode=reader', $output );
 		$this->assertContains( 'v' . AMP__VERSION, $output );
 
 		add_theme_support( AMP_Theme_Support::SLUG, array( 'paired' => true ) );
 		ob_start();
 		amp_add_generator_metadata();
 		$output = ob_get_clean();
-		$this->assertContains( 'mode=paired', $output );
+		$this->assertContains( 'mode=transitional', $output );
 		$this->assertContains( 'v' . AMP__VERSION, $output );
 
 		add_theme_support( AMP_Theme_Support::SLUG, array( 'paired' => false ) );
@@ -523,7 +530,7 @@ class Test_AMP_Helper_Functions extends WP_UnitTestCase {
 		wp_print_scripts();
 		$output = ob_get_clean();
 
-		$this->assertStringStartsWith( '<script type=\'text/javascript\' src=\'https://cdn.ampproject.org/v0.js\' async></script>', $output ); // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript
+		$this->assertContains( '<script type=\'text/javascript\' src=\'https://cdn.ampproject.org/v0.js\' async></script>', $output ); // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript
 		$this->assertContains( '<script type=\'text/javascript\' src=\'https://cdn.ampproject.org/v0/amp-mathml-0.1.js\' async custom-element="amp-mathml"></script>', $output ); // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript
 		$this->assertContains( '<script type=\'text/javascript\' src=\'https://cdn.ampproject.org/v0/amp-mustache-latest.js\' async custom-template="amp-mustache"></script>', $output ); // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript
 
@@ -963,6 +970,60 @@ class Test_AMP_Helper_Functions extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'did_amp_post_template_metadata', $metadata );
 		$this->assertArrayHasKey( 'did_amp_schemaorg_metadata', $metadata );
 		$this->assertEquals( 'George', $metadata['author']['name'] );
+	}
+
+	/**
+	 * Test amp_add_admin_bar_view_link()
+	 *
+	 * @covers \amp_add_admin_bar_view_link()
+	 * @global \WP_Query $wp_query
+	 */
+	public function test_amp_add_admin_bar_item() {
+		require_once ABSPATH . WPINC . '/class-wp-admin-bar.php';
+
+		$post_id = $this->factory()->post->create();
+		$this->go_to( get_permalink( $post_id ) );
+		global $wp_query; // Must be here after the go_to() call.
+
+		// Check that canonical adds no link.
+		add_theme_support( 'amp' );
+		$admin_bar = new WP_Admin_Bar();
+		amp_add_admin_bar_view_link( $admin_bar );
+		$this->assertNull( $admin_bar->get_node( 'amp' ) );
+
+		// Check that paired mode does add link.
+		add_theme_support( 'amp', array( 'paired' => true ) );
+		$admin_bar = new WP_Admin_Bar();
+		amp_add_admin_bar_view_link( $admin_bar );
+		$item = $admin_bar->get_node( 'amp' );
+		$this->assertInternalType( 'object', $item );
+		$this->assertEquals( esc_url( amp_get_permalink( $post_id ) ), $item->href );
+
+		// Confirm that link is added to non-AMP version.
+		set_query_var( amp_get_slug(), '' );
+		$this->assertTrue( is_amp_endpoint() );
+		$admin_bar = new WP_Admin_Bar();
+		amp_add_admin_bar_view_link( $admin_bar );
+		$item = $admin_bar->get_node( 'amp' );
+		$this->assertInternalType( 'object', $item );
+		$this->assertEquals( esc_url( get_permalink( $post_id ) ), $item->href );
+		unset( $wp_query->query_vars[ amp_get_slug() ] );
+		$this->assertFalse( is_amp_endpoint() );
+
+		// Confirm post opt-out works.
+		add_filter( 'amp_skip_post', '__return_true' );
+		$admin_bar = new WP_Admin_Bar();
+		amp_add_admin_bar_view_link( $admin_bar );
+		$this->assertNull( $admin_bar->get_node( 'amp' ) );
+		remove_filter( 'amp_skip_post', '__return_true' );
+
+		// Confirm Reader mode works.
+		remove_theme_support( 'amp' );
+		$admin_bar = new WP_Admin_Bar();
+		amp_add_admin_bar_view_link( $admin_bar );
+		$item = $admin_bar->get_node( 'amp' );
+		$this->assertInternalType( 'object', $item );
+		$this->assertEquals( esc_url( amp_get_permalink( $post_id ) ), $item->href );
 	}
 
 	/**

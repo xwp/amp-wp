@@ -21,6 +21,14 @@ class Test_AMP_Theme_Support extends WP_UnitTestCase {
 	const TESTED_CLASS = 'AMP_Theme_Support';
 
 	/**
+	 * Set up before class.
+	 */
+	public static function setUpBeforeClass() {
+		parent::setUpBeforeClass();
+		AMP_HTTP::$server_timing = true;
+	}
+
+	/**
 	 * Set up.
 	 */
 	public function setUp() {
@@ -164,14 +172,14 @@ class Test_AMP_Theme_Support extends WP_UnitTestCase {
 			)
 		);
 
-		// Test paired mode singular, where not on endpoint that it causes amphtml link to be added.
+		// Test transitional mode singular, where not on endpoint that it causes amphtml link to be added.
 		remove_action( 'wp_head', 'amp_add_amphtml_link' );
 		$this->go_to( get_permalink( $post_id ) );
 		$this->assertFalse( is_amp_endpoint() );
 		AMP_Theme_Support::finish_init();
 		$this->assertEquals( 10, has_action( 'wp_head', 'amp_add_amphtml_link' ) );
 
-		// Test paired mode homepage, where still not on endpoint that it causes amphtml link to be added.
+		// Test transitional mode homepage, where still not on endpoint that it causes amphtml link to be added.
 		remove_action( 'wp_head', 'amp_add_amphtml_link' );
 		$this->go_to( home_url() );
 		$this->assertFalse( is_amp_endpoint() );
@@ -221,7 +229,7 @@ class Test_AMP_Theme_Support extends WP_UnitTestCase {
 		$e = null;
 
 		// Endpoint.
-		unset( $_GET[ amp_get_slug() ] );
+		unset( $_GET[ amp_get_slug() ] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		set_query_var( amp_get_slug(), '' );
 		$_SERVER['REQUEST_URI'] = '/2016/01/24/foo/amp/';
 		try {
@@ -234,11 +242,11 @@ class Test_AMP_Theme_Support extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test ensure_proper_amp_location for paired.
+	 * Test ensure_proper_amp_location for transitional.
 	 *
 	 * @covers AMP_Theme_Support::ensure_proper_amp_location()
 	 */
-	public function test_ensure_proper_amp_location_paired() {
+	public function test_ensure_proper_amp_location_transitional() {
 		add_theme_support(
 			AMP_Theme_Support::SLUG,
 			array(
@@ -253,7 +261,7 @@ class Test_AMP_Theme_Support extends WP_UnitTestCase {
 		$this->assertFalse( AMP_Theme_Support::ensure_proper_amp_location( false ) );
 
 		// Endpoint, redirect.
-		unset( $_GET[ amp_get_slug() ] );
+		unset( $_GET[ amp_get_slug() ] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		set_query_var( amp_get_slug(), '' );
 		$_SERVER['REQUEST_URI'] = '/2016/01/24/foo/amp/';
 		try {
@@ -326,12 +334,12 @@ class Test_AMP_Theme_Support extends WP_UnitTestCase {
 		query_posts( array( 'p' => $post_id ) ); // phpcs:ignore
 		$this->assertTrue( is_singular() );
 
-		// Paired support is not available if theme support is not present or canonical.
+		// Transitional support is not available if theme support is not present or canonical.
 		$this->assertFalse( AMP_Theme_Support::is_paired_available() );
 		add_theme_support( AMP_Theme_Support::SLUG );
 		$this->assertFalse( AMP_Theme_Support::is_paired_available() );
 
-		// Paired mode is available once template_dir is supplied.
+		// Transitional mode is available once template_dir is supplied.
 		add_theme_support(
 			AMP_Theme_Support::SLUG,
 			array(
@@ -340,7 +348,7 @@ class Test_AMP_Theme_Support extends WP_UnitTestCase {
 		);
 		$this->assertTrue( AMP_Theme_Support::is_paired_available() );
 
-		// Paired mode not available when post does not support AMP.
+		// Transitional mode not available when post does not support AMP.
 		add_filter( 'amp_skip_post', '__return_true' );
 		$this->assertFalse( AMP_Theme_Support::is_paired_available() );
 		$this->assertTrue( is_singular() );
@@ -462,6 +470,7 @@ class Test_AMP_Theme_Support extends WP_UnitTestCase {
 	 */
 	public function test_incorrect_usage_get_template_availability() {
 		global $wp_query;
+		remove_action( 'parse_query', 'wp_hide_admin_bar_offline' );
 
 		// Test no query available.
 		$wp_query     = null;
@@ -489,6 +498,7 @@ class Test_AMP_Theme_Support extends WP_UnitTestCase {
 	 * @covers AMP_Theme_Support::get_template_availability()
 	 */
 	public function test_get_template_availability_with_available_callback() {
+		remove_action( 'parse_query', 'wp_hide_admin_bar_offline' );
 		$this->go_to( get_permalink( $this->factory()->post->create() ) );
 		add_theme_support(
 			AMP_Theme_Support::SLUG,
@@ -533,6 +543,7 @@ class Test_AMP_Theme_Support extends WP_UnitTestCase {
 	 * @covers AMP_Theme_Support::get_template_availability()
 	 */
 	public function test_get_template_availability() {
+		remove_action( 'parse_query', 'wp_hide_admin_bar_offline' );
 		global $wp_query;
 		$post_id = $this->factory()->post->create();
 		query_posts( array( 'p' => $post_id ) ); // phpcs:ignore
@@ -835,7 +846,7 @@ class Test_AMP_Theme_Support extends WP_UnitTestCase {
 		$this->assertFalse( has_action( 'wp_head', 'wp_oembed_add_host_js' ) );
 
 		$this->assertEquals( 20, has_action( 'wp_head', 'amp_add_generator_metadata' ) );
-		$this->assertEquals( 10, has_action( 'wp_enqueue_scripts', array( self::TESTED_CLASS, 'enqueue_assets' ) ) );
+		$this->assertEquals( 0, has_action( 'wp_enqueue_scripts', array( self::TESTED_CLASS, 'enqueue_assets' ) ) );
 
 		$this->assertEquals( 1000, has_action( 'wp_enqueue_scripts', array( self::TESTED_CLASS, 'dequeue_customize_preview_scripts' ) ) );
 		$this->assertEquals( 10, has_filter( 'customize_partial_render', array( self::TESTED_CLASS, 'filter_customize_partial_render' ) ) );
@@ -918,7 +929,7 @@ class Test_AMP_Theme_Support extends WP_UnitTestCase {
 		$this->assertContains( '<div submit-success>', $output );
 		$this->assertContains( '<div submit-error>', $output );
 
-		// Test paired AMP.
+		// Test transitional AMP.
 		add_theme_support(
 			AMP_Theme_Support::SLUG,
 			array(
@@ -1305,6 +1316,15 @@ class Test_AMP_Theme_Support extends WP_UnitTestCase {
 	 * @covers \amp_render_scripts()
 	 */
 	public function test_prepare_response() {
+		remove_action( 'wp_print_scripts', 'wp_print_service_workers', 9 );
+
+		add_filter(
+			'home_url',
+			function ( $url ) {
+				return set_url_scheme( $url, 'https' );
+			}
+		);
+
 		wp();
 		$prepare_response_args = array(
 			'enable_response_caching' => false,
@@ -1348,8 +1368,8 @@ class Test_AMP_Theme_Support extends WP_UnitTestCase {
 			'<script src="https://cdn.ampproject.org/v0/amp-audio-0.1.js" async="" custom-element="amp-audio"></script>',
 			'<script src="https://cdn.ampproject.org/v0/amp-ad-0.1.js" async="" custom-element="amp-ad"></script>',
 
-			'<link rel="icon" href="http://example.org/favicon.png" sizes="32x32">',
-			'<link rel="icon" href="http://example.org/favicon.png" sizes="192x192">',
+			'<link rel="icon" href="https://example.org/favicon.png" sizes="32x32">',
+			'<link rel="icon" href="https://example.org/favicon.png" sizes="192x192">',
 
 			'#<style amp-custom>.*?body\s*{\s*background:\s*black;?\s*}.*?</style>#s',
 			'<link crossorigin="anonymous" rel="stylesheet" id="my-font-css" href="https://fonts.googleapis.com/css?family=Tangerine" type="text/css" media="all">',

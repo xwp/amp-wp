@@ -206,6 +206,14 @@ class AMP_Style_Sanitizer_Test extends WP_UnitTestCase {
 					'.widget:not(.widget_text,.jetpack_widget_social_icons[title="a,b"]) ul{color:red}',
 				),
 			),
+
+			'selector_with_escaped_char_class_name'      => array(
+				'<style>.lg\:w-full { width: 100%; }</style><div class="bg-black w-16 lg:w-full hover:bg-blue"></div>',
+				'<div class="bg-black w-16 lg:w-full hover:bg-blue"></div>',
+				array(
+					'.lg\:w-full{width:100%}',
+				),
+			),
 		);
 	}
 
@@ -318,7 +326,7 @@ class AMP_Style_Sanitizer_Test extends WP_UnitTestCase {
 					)
 				),
 				array(
-					'form [submit-success] b,div[submit-failure] b{color:green}',
+					'form [submit-success] b{color:green}', // The [submit-failure] selector is removed because there is no div[submit-failure].
 					'amp-live-list li .highlighted{background:yellow}',
 					'',
 					'body amp-list .portland{color:blue}',
@@ -358,7 +366,7 @@ class AMP_Style_Sanitizer_Test extends WP_UnitTestCase {
 				array(),
 			),
 			'unamerican_lang_attribute_selectors_removed' => array( // USA is used for convenience here. No political statement intended.
-				'<html amp><head><meta charset="utf-8"><style>html[lang=en-US] {color:red} html[lang="en-US"] {color:white} html[lang^=en] {color:blue} html[lang="en-CA"] {color:red}  html[lang^=ar] { color:green; } html[lang="es-MX"] { color:green; }</style></head><body><span>Test</span></body></html>',
+				'<html lang="en-US" amp><head><meta charset="utf-8"><style>html[lang=en-US] {color:red} html[lang="en-US"] {color:white} html[lang^=en] {color:blue} html[lang="en-CA"] {color:red}  html[lang^=ar] { color:green; } html[lang="es-MX"] { color:green; }</style></head><body><span>Test</span></body></html>',
 				array(
 					'html[lang=en-US]{color:red}html[lang="en-US"]{color:white}html[lang^=en]{color:blue}',
 				),
@@ -592,6 +600,11 @@ class AMP_Style_Sanitizer_Test extends WP_UnitTestCase {
 				'div img.logo{border:solid 1px red}',
 				'', // The selector is removed because there is no div element.
 			),
+			'attribute_selectors' => array(
+				'<div id="content" tabindex="-1"></div><button type=button>Hello</button><a href="#">Top</a><span></span>',
+				'[type="button"], [type="reset"], [type^="submit"] {color:red} a[href^=http]:after, a[href^="#"]:after { color:blue } span[hidden] {display:none}#content[tabindex="-1"]:focus{ outline: solid 1px red; }',
+				'[type="button"],[type="reset"],[type^="submit"]{color:red}a[href^=http]:after,a[href^="#"]:after{color:blue}span[hidden]{display:none}#content[tabindex="-1"]:focus{outline:solid 1px red}', // Any selector mentioning [type] or [href] will persist since value is not used for tree shaking.
+			),
 			'playbuzz' => array(
 				'<p>hello</p><div class="pb_feed" data-item="226dd4c0-ef13-4fee-850b-7be32bf6d121"></div>',
 				'p + div.pb_feed{border:solid 1px blue}',
@@ -601,6 +614,11 @@ class AMP_Style_Sanitizer_Test extends WP_UnitTestCase {
 				'<article><video src="http://example.com" height="100" width="200"></video></article>',
 				'article>video{border:solid 1px green}',
 				'article>amp-video{border:solid 1px green}',
+			),
+			'form' => array(
+				sprintf( '<div id="search"><form method="get" action="https://example.com"><label id="s">Search</label><input type="search" name="s" id="s"></form></div>' ),
+				'#search form label{display:block}',
+				'#search form label{display:block}',
 			),
 			'video_with_amp_video' => array(
 				'<amp-video class="video"></amp-video>',
@@ -625,7 +643,7 @@ class AMP_Style_Sanitizer_Test extends WP_UnitTestCase {
 			'type_class_names' => array(
 				'<audio src="https://example.org/foo.mp3" width="100" height="100" class="audio iframe video img form">',
 				'.video{color:blue;} audio.audio{color:purple;} .iframe{color:black;} .img{color:purple;} .form:not(form){color:green;}',
-				'.video{color:blue}amp-audio.audio{color:purple}.iframe{color:black}.img{color:purple}.form:not(amp-form){color:green}',
+				'.video{color:blue}amp-audio.audio{color:purple}.iframe{color:black}.img{color:purple}.form:not(form){color:green}',
 			),
 		);
 	}
@@ -653,6 +671,133 @@ class AMP_Style_Sanitizer_Test extends WP_UnitTestCase {
 		);
 		$stylesheets = array_values( $sanitized['stylesheets'] );
 		$this->assertEquals( $output, $stylesheets[0] );
+	}
+
+	/**
+	 * Provide data for attribute selector test.
+	 *
+	 * @return array Data.
+	 */
+	public function get_attribute_selector_data() {
+		return array(
+			'type_attribute' => array(
+				'<input type="color">',
+				// All selectors remain because only the existence of the attribute is examined.
+				array(
+					'[type="button"]' => true,
+					'[type*="reset"]' => true,
+					'[type^="submit"]' => true,
+					'[type$="button"]' => true,
+				),
+			),
+			'tabindex_attribute' => array(
+				'<span tabindex="-1"></span>',
+				// The div[tabindex] is removed because there is no div. The span[tabindex^=2] remains because value is not considered.
+				array(
+					'div[tabindex]' => false,
+					'span[tabindex]' => true,
+					'span[tabindex=-1]' => true,
+					'span[tabindex^=2]' => true,
+				),
+			),
+			'href_attribute' => array(
+				'<a href="foo">Foo</a>',
+				array(
+					'a[href^=http]:after' => true,
+					'a[href^="#"]:after' => true,
+				),
+			),
+			'hidden_attribute' => array(
+				'<span>not hidden</span>',
+				// Only div[hidden] should be removed because there is no div element; the other [hidden] selectors remain because it can be dynamically added.
+				array(
+					'span[hidden]' => true,
+					'[hidden]' => true,
+					'div[hidden]' => false,
+					'span:not([hidden])' => true,
+				),
+			),
+			'selected_readonly_disabled_multiple_autofocus_required' => array(
+				'<input><select><option></option></select>',
+				array(
+					'[autofocus]' => true,
+					'[checked]'   => true,
+					'[disabled]'  => true,
+					'[multiple]'  => true,
+					'[readonly]'  => true,
+					'[required]'  => true,
+					'[selected]'  => true,
+				),
+			),
+			'open_attribute' => array(
+				'<details><summary>More</summary>Details</details>',
+				array(
+					'[open]'             => true,
+					'amp-lightbox[open]' => false,
+					'details[open]'      => true,
+				),
+			),
+			'media_attributes' => array(
+				'<amp-video width="720" height="305" layout="responsive" src="https://yourhost.com/videos/myvideo.mp4" poster="https://yourhost.com/posters/poster.png" artwork="https://yourhost.com/artworks/artwork.png" title="Awesome video" artist="Awesome artist" album="Amazing album"></amp-video>',
+				array(
+					'[loop]'     => true,
+					'[controls]' => true,
+				),
+			),
+			'escaped_char_class_name' => array(
+				'<div class="bg-black w-16 lg:w-full hover:bg-blue @@@"></div>',
+				array(
+					'.lg'               => false,
+					'.hover'            => false,
+					'.hover\:bg-blue'   => true,
+					'.lg\:w-full'       => true,
+					'.lg\:w-full:hover' => true,
+					'.lg\:w-medium'     => false,
+					'.\@\@\@'           => true,
+					'.\@\@\@\@'         => false,
+				),
+			),
+		);
+	}
+
+	/**
+	 * Test attribute selector tree shaking.
+	 *
+	 * @dataProvider get_attribute_selector_data
+	 *
+	 * @param string $markup      Source HTML markup.
+	 * @param array  $selectors   Mapping of selectors to whether they are expected.
+	 */
+	public function test_attribute_selector( $markup, $selectors ) {
+		$style = implode(
+			'',
+			array_map(
+				function ( $selector ) {
+					return sprintf( '%s{ color: red; }', $selector );
+				},
+				array_keys( $selectors )
+			)
+		);
+
+		$html = "<html amp><head><meta charset=utf-8><style amp-custom>$style</style></head><body>$markup</body></html>";
+		$dom  = AMP_DOM_Utils::get_dom( $html );
+
+		$sanitizer_classes = amp_get_content_sanitizers();
+		$sanitizer_classes['AMP_Style_Sanitizer']['remove_unused_rules'] = 'always';
+
+		$sanitized = AMP_Content_Sanitizer::sanitize_document(
+			$dom,
+			$sanitizer_classes,
+			array(
+				'use_document_element' => true,
+			)
+		);
+
+		$stylesheets = array_values( $sanitized['stylesheets'] );
+
+		$actual_selectors   = array_values( array_filter( preg_split( '/{.+?}/s', $stylesheets[0] ) ) );
+		$expected_selectors = array_keys( array_filter( $selectors ) );
+		$this->assertEqualSets( $expected_selectors, $actual_selectors );
 	}
 
 	/**
@@ -906,6 +1051,47 @@ class AMP_Style_Sanitizer_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test handling of stylesheets with @font-face that have data: url source.
+	 *
+	 * Also confirm that class-based tree-shaking is working.
+	 *
+	 * @link https://github.com/ampproject/amp-wp/pull/2079
+	 *
+	 * @covers AMP_Style_Sanitizer::process_font_face_at_rule()
+	 */
+	public function test_font_data_url_handling_without_file_sources() {
+		$theme = new WP_Theme( 'twentynineteen', ABSPATH . 'wp-content/themes' );
+		if ( $theme->errors() ) {
+			$this->markTestSkipped( 'Twenty Nineteen is not installed.' );
+		}
+
+		$html  = '<html amp><head><meta charset="utf-8">';
+		$html .= sprintf( '<link rel="stylesheet" href="%s">', esc_url( $theme->get_stylesheet_directory_uri() . '/style.css' ) ); // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
+		$html .= '</head><body></body></html>';
+
+		$dom         = AMP_DOM_Utils::get_dom( $html );
+		$error_codes = array();
+		$sanitizer   = new AMP_Style_Sanitizer(
+			$dom,
+			array(
+				'use_document_element' => true,
+			)
+		);
+		$sanitizer->sanitize();
+		$this->assertEquals( array(), $error_codes );
+		$actual_stylesheets = array_values( $sanitizer->get_stylesheets() );
+		$this->assertCount( 1, $actual_stylesheets );
+
+		$this->assertContains( '@font-face{font-family:"NonBreakingSpaceOverride";', $actual_stylesheets[0] );
+		$this->assertContains( 'format("woff2")', $actual_stylesheets[0] );
+		$this->assertContains( 'format("woff")', $actual_stylesheets[0] );
+		$this->assertNotContains( 'data:', $actual_stylesheets[0] );
+		$this->assertContains( 'fonts/NonBreakingSpaceOverride.woff2', $actual_stylesheets[0] );
+		$this->assertContains( 'fonts/NonBreakingSpaceOverride.woff', $actual_stylesheets[0] );
+		$this->assertContains( 'font-display:swap', $actual_stylesheets[0] );
+	}
+
+	/**
 	 * Test that auto-removal (tree shaking) does not remove rules for classes mentioned in class and [class] attributes.
 	 *
 	 * @covers AMP_Style_Sanitizer::get_used_class_names()
@@ -1004,7 +1190,7 @@ class AMP_Style_Sanitizer_Test extends WP_UnitTestCase {
 			@media screen {}
 			</style>
 		';
-		$html .= '</head><body><span class="b">...</span><span id="exists"></span></body></html>';
+		$html .= '</head><body><span class="b" data-value="">...</span><span id="exists"></span></body></html>';
 		$dom   = AMP_DOM_Utils::get_dom( $html );
 
 		$error_codes = array();

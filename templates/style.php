@@ -34,6 +34,7 @@ $header_color            = $this->get_customizer_setting( 'header_color' );
 
 .aligncenter {
 	display: block;
+	text-align: center;
 	margin-left: auto;
 	margin-right: auto;
 }
@@ -44,11 +45,7 @@ $header_color            = $this->get_customizer_setting( 'header_color' );
 	margin: 0 auto;
 }
 
-.amp-wp-unknown-size img {
-	/** Worst case scenario when we can't figure out dimensions for an image. **/
-	/** Force the image into a box of fixed dimensions and use object-fit to scale. **/
-	object-fit: contain;
-}
+<?php echo file_get_contents( AMP__DIR__ . '/assets/css/amp-default.css' ); // phpcs:ignore WordPress.WP.AlternativeFunctions ?>
 
 /* Template Styles */
 
@@ -140,7 +137,20 @@ blockquote p:last-child {
 	text-decoration: none;
 }
 
-/* Site Icon */
+<?php if ( $this->get( 'post_canonical_link_url' ) || is_customize_preview() ) : ?>
+	.amp-wp-header .amp-wp-canonical-link {
+		font-size: 0.8em;
+		text-decoration: underline;
+		position: absolute;
+		<?php
+		$distance = 18;
+		if ( $this->get( 'site_icon_url' ) ) {
+			$distance += 32 + 10; // Width of site icon with margin.
+		}
+		printf( '%s: %dpx;', is_rtl() ? 'left' : 'right', $distance ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		?>
+	}
+<?php endif; ?>
 
 .amp-wp-header .amp-wp-site-icon {
 	/** site icon is 32px **/
@@ -283,6 +293,11 @@ blockquote p:last-child {
 }
 
 /* AMP Media */
+
+.alignwide,
+.alignfull {
+	clear: both;
+}
 
 amp-carousel {
 	background: <?php echo sanitize_hex_color( $border_color ); ?>;

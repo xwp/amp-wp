@@ -457,7 +457,7 @@ class AMP_Validated_URL_Post_Type {
 		$result = array();
 		if ( $counts['new_rejected'] ) {
 			$result[] = sprintf(
-				/* translators: %1$s is the status, %2$s is the count */
+				/* translators: 1: status. 2: count. */
 				'<span class="status-text new new-rejected">%1$s: %2$s</span>',
 				esc_html__( 'New Rejected', 'amp' ),
 				number_format_i18n( $counts['new_rejected'] )
@@ -465,7 +465,7 @@ class AMP_Validated_URL_Post_Type {
 		}
 		if ( $counts['new_accepted'] ) {
 			$result[] = sprintf(
-				/* translators: %1$s is the status, %2$s is the count */
+				/* translators: 1: status. 2: count. */
 				'<span class="status-text new new-accepted">%1$s: %2$s</span>',
 				esc_html__( 'New Accepted', 'amp' ),
 				number_format_i18n( $counts['new_accepted'] )
@@ -561,7 +561,7 @@ class AMP_Validated_URL_Post_Type {
 		}
 		$url = $post->post_title;
 
-		// Add AMP query var if in paired mode.
+		// Add AMP query var if in transitional mode.
 		if ( ! amp_is_canonical() ) {
 			$url = add_query_arg( amp_get_slug(), '', $url );
 		}
@@ -576,7 +576,7 @@ class AMP_Validated_URL_Post_Type {
 	 * Normalize a URL for storage.
 	 *
 	 * This ensures that query vars like utm_* and the like will not cause duplicates.
-	 * The AMP query param is removed to facilitate switching between native and paired.
+	 * The AMP query param is removed to facilitate switching between native and transitional.
 	 * The URL scheme is also normalized to HTTPS to help with transition from HTTP to HTTPS.
 	 *
 	 * @param string $url URL.
@@ -653,9 +653,14 @@ class AMP_Validated_URL_Post_Type {
 		$stored_validation_errors = array();
 
 		// Prevent Kses from corrupting JSON in description.
-		$has_pre_term_description_filter = has_filter( 'pre_term_description', 'wp_filter_kses' );
-		if ( false !== $has_pre_term_description_filter ) {
-			remove_filter( 'pre_term_description', 'wp_filter_kses', $has_pre_term_description_filter );
+		$pre_term_description_filters = array(
+			'wp_filter_kses'       => has_filter( 'pre_term_description', 'wp_filter_kses' ),
+			'wp_targeted_link_rel' => has_filter( 'pre_term_description', 'wp_targeted_link_rel' ),
+		);
+		foreach ( $pre_term_description_filters as $callback => $priority ) {
+			if ( false !== $priority ) {
+				remove_filter( 'pre_term_description', $callback, $priority );
+			}
 		}
 
 		$terms = array();
@@ -713,8 +718,10 @@ class AMP_Validated_URL_Post_Type {
 		}
 
 		// Finish preventing Kses from corrupting JSON in description.
-		if ( false !== $has_pre_term_description_filter ) {
-			add_filter( 'pre_term_description', 'wp_filter_kses', $has_pre_term_description_filter );
+		foreach ( $pre_term_description_filters as $callback => $priority ) {
+			if ( false !== $priority ) {
+				add_filter( 'pre_term_description', $callback, $priority );
+			}
 		}
 
 		$post_content = wp_json_encode( $stored_validation_errors );
@@ -1235,22 +1242,22 @@ class AMP_Validated_URL_Post_Type {
 			} elseif ( current_theme_supports( AMP_Theme_Support::SLUG ) ) {
 				$template_mode = 'paired';
 			} else {
-				$template_mode = 'classic';
+				$template_mode = 'reader';
 			}
 			$auto_sanitization = AMP_Options_Manager::get_option( 'auto_accept_sanitization' );
 
 			if ( 'native' === $template_mode ) {
 				$message = __( 'The site is using native AMP mode, the validation errors found are already automatically handled.', 'amp' );
 			} elseif ( 'paired' === $template_mode && $auto_sanitization ) {
-				$message = __( 'The site is using paired AMP mode with auto-sanitization turned on, the validation errors found are already automatically handled.', 'amp' );
+				$message = __( 'The site is using transitional AMP mode with auto-sanitization turned on, the validation errors found are already automatically handled.', 'amp' );
 			} elseif ( 'paired' === $template_mode ) {
 				$message = sprintf(
 					/* translators: %s is a link to the AMP settings screen */
-					__( 'The site is using paired AMP mode without auto-sanitization, the validation errors found require action and influence which pages are shown in AMP. For automatically handling the errors turn on auto-sanitization from <a href="%s">Validation Handling settings</a>.', 'amp' ),
+					__( 'The site is using transitional AMP mode without auto-sanitization, the validation errors found require action and influence which pages are shown in AMP. For automatically handling the errors turn on auto-sanitization from <a href="%s">Validation Handling settings</a>.', 'amp' ),
 					esc_url( admin_url( 'admin.php?page=' . AMP_Options_Manager::OPTION_NAME ) )
 				);
 			} else {
-				$message = __( 'The site is using classic AMP mode, your theme templates are not used and the errors below are irrelevant.', 'amp' );
+				$message = __( 'The site is using AMP reader mode, your theme templates are not used and the errors below are irrelevant.', 'amp' );
 			}
 
 			$class = 'info';
@@ -1907,8 +1914,8 @@ class AMP_Validated_URL_Post_Type {
 			return;
 		}
 
-		$post_id = intval( $_REQUEST['post'] );
-		if ( ! empty( $post_id ) && self::POST_TYPE_SLUG === get_post_type( $post_id ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$post_id = (int) $_REQUEST['post']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! empty( $post_id ) && self::POST_TYPE_SLUG === get_post_type( $post_id ) ) {
 			$_REQUEST['taxonomy'] = AMP_Validation_Error_Taxonomy::TAXONOMY_SLUG;
 		}
 	}

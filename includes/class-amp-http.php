@@ -21,6 +21,21 @@ class AMP_HTTP {
 	public static $headers_sent = array();
 
 	/**
+	 * Whether Server-Timing headers are sent.
+	 *
+	 * By default this is false to prevent breaking some web servers with an unexpected number of response headers. To
+	 * enable in `WP_DEBUG` mode, consider the following plugin code:
+	 *
+	 *     add_action( 'amp_init', function () {
+	 *         AMP_HTTP::$server_timing = ( ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || current_user_can( 'manage_options' ) );
+	 *     } );
+	 *
+	 * @link https://gist.github.com/westonruter/053f8f47c21df51f1a081fc41b47f547
+	 * @var bool
+	 */
+	public static $server_timing = false;
+
+	/**
 	 * AMP-specific query vars that were purged.
 	 *
 	 * @since 0.7
@@ -83,7 +98,7 @@ class AMP_HTTP {
 	 * @return bool Return value of send_header call. If WP_DEBUG is not enabled or admin user (who can manage_options) is not logged-in, this will always return false.
 	 */
 	public static function send_server_timing( $name, $duration = null, $description = null ) {
-		if ( ! WP_DEBUG && ! current_user_can( 'manage_options' ) ) {
+		if ( ! self::$server_timing ) {
 			return false;
 		}
 		$value = $name;
@@ -123,11 +138,11 @@ class AMP_HTTP {
 
 		// Scrub input vars.
 		foreach ( $query_vars as $query_var ) {
-			if ( ! isset( $_GET[ $query_var ] ) ) { // phpcs:ignore
+			if ( ! isset( $_GET[ $query_var ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				continue;
 			}
-			self::$purged_amp_query_vars[ $query_var ] = wp_unslash( $_GET[ $query_var ] ); // phpcs:ignore
-			unset( $_REQUEST[ $query_var ], $_GET[ $query_var ] );
+			self::$purged_amp_query_vars[ $query_var ] = wp_unslash( $_GET[ $query_var ] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			unset( $_REQUEST[ $query_var ], $_GET[ $query_var ] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$scrubbed = true;
 		}
 

@@ -3,9 +3,9 @@
  * Plugin Name: AMP
  * Description: Enable AMP on your WordPress site, the WordPress way.
  * Plugin URI: https://amp-wp.org
- * Author: WordPress.com VIP, XWP, Google, and contributors
+ * Author: AMP Project Contributors
  * Author URI: https://github.com/ampproject/amp-wp/graphs/contributors
- * Version: 1.1-alpha
+ * Version: 1.1.3
  * Text Domain: amp
  * Domain Path: /languages/
  * License: GPLv2 or later
@@ -14,108 +14,192 @@
  */
 
 /**
- * Print admin notice regarding having an old version of PHP.
+ * Errors encountered while loading the plugin.
  *
- * @since 0.7
+ * This has to be a global for the same of PHP 5.2.
+ *
+ * @var \WP_Error $_amp_load_errors
  */
-function _amp_print_php_version_admin_notice() {
-	?>
-	<div class="notice notice-error">
-		<p>
-			<?php
-			sprintf(
-				/* translators: %s: required PHP version */
-				esc_html__( 'The AMP plugin requires PHP %s. Please contact your host to update your PHP version.', 'amp' ),
-				'5.4+'
-			);
-			?>
-		</p>
-	</div>
-	<?php
-}
+global $_amp_load_errors;
+
+$_amp_load_errors = new \WP_Error();
+
 if ( version_compare( phpversion(), '5.4', '<' ) ) {
-	add_action( 'admin_notices', '_amp_print_php_version_admin_notice' );
-	return;
+	$_amp_load_errors->add(
+		'insufficient_php_version',
+		sprintf(
+			/* translators: %s: required PHP version */
+			__( 'The AMP plugin requires PHP %s. Please contact your host to update your PHP version.', 'amp' ),
+			'5.4+'
+		)
+	);
 }
 
-/**
- * Print admin notice regarding DOM extension is not installed.
- *
- * @since 1.0
- */
-function _amp_print_php_dom_document_notice() {
-	?>
-	<div class="notice notice-error">
-		<p>
-			<?php
-				printf(
-					/* translators: %s: PHP extension name */
-					esc_html__( 'The AMP plugin requires the %s extension in PHP. Please contact your host to install this extension.', 'amp' ),
-					'DOM'
-				);
-			?>
-		</p>
-	</div>
-	<?php
+// See composer.json for this list.
+$_amp_required_extensions = array(
+	// Required by FasterImage.
+	'curl'   => array(
+		'functions' => array(
+			'curl_close',
+			'curl_error',
+			'curl_exec',
+			'curl_init',
+			'curl_setopt',
+		),
+	),
+	'dom'    => array(
+		'classes' => array(
+			'DOMAttr',
+			'DOMComment',
+			'DOMDocument',
+			'DOMElement',
+			'DOMNode',
+			'DOMNodeList',
+			'DOMXPath',
+		),
+	),
+	// Required by PHP-CSS-Parser.
+	'iconv'  => array(
+		'functions' => array( 'iconv' ),
+	),
+	'libxml' => array(
+		'functions' => array( 'libxml_use_internal_errors' ),
+	),
+	'spl'    => array(
+		'functions' => array( 'spl_autoload_register' ),
+	),
+);
+$_amp_missing_extensions = array();
+$_amp_missing_classes    = array();
+$_amp_missing_functions  = array();
+foreach ( $_amp_required_extensions as $_amp_required_extension => $_amp_required_constructs ) {
+	if ( ! extension_loaded( $_amp_required_extension ) ) {
+		$_amp_missing_extensions[] = "<code>$_amp_required_extension</code>";
+	} else {
+		foreach ( $_amp_required_constructs as $_amp_construct_type => $_amp_constructs ) {
+			switch ( $_amp_construct_type ) {
+				case 'functions':
+					foreach ( $_amp_constructs as $_amp_construct ) {
+						if ( ! function_exists( $_amp_construct ) ) {
+							$_amp_missing_functions[] = "<code>$_amp_construct</code>";
+						}
+					}
+					break;
+				case 'classes':
+					foreach ( $_amp_constructs as $_amp_construct ) {
+						if ( ! class_exists( $_amp_construct ) ) {
+							$_amp_missing_classes[] = "<code>$_amp_construct</code>";
+						}
+					}
+					break;
+			}
+		}
+		unset( $_amp_construct_type, $_amp_constructs );
+	}
 }
-if ( ! class_exists( 'DOMDocument' ) ) {
-	add_action( 'admin_notices', '_amp_print_php_dom_document_notice' );
-	return;
+if ( count( $_amp_missing_extensions ) > 0 ) {
+	$_amp_load_errors->add(
+		'missing_extension',
+		sprintf(
+			/* translators: %s is list of missing extensions */
+			_n(
+				'The following PHP extension is missing: %s. Please contact your host to finish installation.',
+				'The following PHP extensions are missing: %s. Please contact your host to finish installation.',
+				count( $_amp_missing_extensions ),
+				'amp'
+			),
+			implode( ', ', $_amp_missing_extensions )
+		)
+	);
+}
+if ( count( $_amp_missing_classes ) > 0 ) {
+	$_amp_load_errors->add(
+		'missing_class',
+		sprintf(
+			/* translators: %s is list of missing extensions */
+			_n(
+				'The following PHP class is missing: %s. Please contact your host to finish installation.',
+				'The following PHP classes are missing: %s. Please contact your host to finish installation.',
+				count( $_amp_missing_classes ),
+				'amp'
+			),
+			implode( ', ', $_amp_missing_classes )
+		)
+	);
+}
+if ( count( $_amp_missing_functions ) > 0 ) {
+	$_amp_load_errors->add(
+		'missing_class',
+		sprintf(
+			/* translators: %s is list of missing extensions */
+			_n(
+				'The following PHP function is missing: %s. Please contact your host to finish installation.',
+				'The following PHP functions are missing: %s. Please contact your host to finish installation.',
+				count( $_amp_missing_functions ),
+				'amp'
+			),
+			implode( ', ', $_amp_missing_functions )
+		)
+	);
 }
 
-/**
- * Print admin notice regarding DOM extension is not installed.
- *
- * @since 1.0.1
- */
-function _amp_print_php_missing_iconv_notice() {
-	?>
-	<div class="notice notice-error">
-		<p>
-			<?php
-				printf(
-					/* translators: %s: PHP extension name */
-					esc_html__( 'The AMP plugin requires the %s extension in PHP. Please contact your host to install this extension.', 'amp' ),
-					'iconv'
-				);
-			?>
-		</p>
-	</div>
-	<?php
-}
-if ( ! function_exists( 'iconv' ) ) {
-	add_action( 'admin_notices', '_amp_print_php_missing_iconv_notice' );
-	return;
-}
+unset( $_amp_required_extensions, $_amp_missing_extensions, $_amp_required_constructs, $_amp_missing_classes, $_amp_missing_functions, $_amp_required_extension, $_amp_construct_type, $_amp_construct, $_amp_constructs );
 
-/**
- * Print admin notice when composer install has not been performed.
- *
- * @since 1.0
- */
-function _amp_print_build_needed_notice() {
-	?>
-	<div class="notice notice-error">
-		<p>
-			<?php
-			printf(
-				/* translators: %s: composer install && npm install && npm run build */
-				__( 'You appear to be running the AMP plugin from source. Please do %s to finish installation.', 'amp' ), // phpcs:ignore WordPress.Security.EscapeOutput
-				'<code>composer install && npm install && npm run build</code>'
-			);
-			?>
-		</p>
-	</div>
-	<?php
-}
 if ( ! file_exists( __DIR__ . '/vendor/autoload.php' ) || ! file_exists( __DIR__ . '/vendor/sabberworm/php-css-parser' ) || ! file_exists( __DIR__ . '/assets/js/amp-block-editor-toggle-compiled.js' ) ) {
-	add_action( 'admin_notices', '_amp_print_build_needed_notice' );
+	$_amp_load_errors->add(
+		'build_required',
+		sprintf(
+			/* translators: %s: composer install && npm install && npm run build */
+			__( 'You appear to be running the AMP plugin from source. Please do %s to finish installation.', 'amp' ), // phpcs:ignore WordPress.Security.EscapeOutput
+			'<code>composer install && npm install && npm run build</code>'
+		)
+	);
+}
+
+/**
+ * Displays an admin notice about why the plugin is unable to load.
+ *
+ * @since 1.1.2
+ * @global \WP_Error $_amp_load_errors
+ */
+function _amp_show_load_errors_admin_notice() {
+	global $_amp_load_errors;
+	?>
+	<div class="notice notice-error">
+		<p>
+			<strong><?php esc_html_e( 'AMP plugin unable to initialize.', 'amp' ); ?></strong>
+			<ul>
+			<?php foreach ( array_keys( $_amp_load_errors->errors ) as $error_code ) : ?>
+				<?php foreach ( $_amp_load_errors->get_error_messages( $error_code ) as $message ) : ?>
+					<li>
+						<?php echo wp_kses_post( $message ); ?>
+					</li>
+				<?php endforeach; ?>
+			<?php endforeach; ?>
+			</ul>
+		</p>
+	</div>
+	<?php
+}
+
+// Abort if dependencies are not satisfied.
+if ( ! empty( $_amp_load_errors->errors ) ) {
+	add_action( 'admin_notices', '_amp_show_load_errors_admin_notice' );
+	if ( defined( 'WP_CLI' ) && WP_CLI ) {
+		$messages = array( __( 'AMP plugin unable to initialize.', 'amp' ) );
+		foreach ( array_keys( $_amp_load_errors->errors ) as $error_code ) {
+			$messages = array_merge( $messages, $_amp_load_errors->get_error_messages( $error_code ) );
+		}
+		$message = implode( "\n * ", $messages );
+		$message = str_replace( array( '<code>', '</code>' ), '`', $message );
+		WP_CLI::warning( $message );
+	}
 	return;
 }
 
 define( 'AMP__FILE__', __FILE__ );
 define( 'AMP__DIR__', dirname( __FILE__ ) );
-define( 'AMP__VERSION', '1.1-alpha' );
+define( 'AMP__VERSION', '1.1.3' );
 
 /**
  * Print admin notice if plugin installed with incorrect slug (which impacts WordPress's auto-update system).
@@ -252,6 +336,7 @@ function amp_init() {
 	AMP_HTTP::handle_xhr_request();
 	AMP_Theme_Support::init();
 	AMP_Validation_Manager::init();
+	AMP_Service_Worker::init();
 	add_action( 'init', array( 'AMP_Post_Type_Support', 'add_post_type_support' ), 1000 ); // After post types have been defined.
 
 	if ( defined( 'WP_CLI' ) && WP_CLI ) {
@@ -266,6 +351,7 @@ function amp_init() {
 	add_action( 'wp_loaded', 'amp_add_options_menu' );
 	add_action( 'wp_loaded', 'amp_admin_pointer' );
 	add_action( 'parse_query', 'amp_correct_query_when_is_front_page' );
+	add_action( 'admin_bar_menu', 'amp_add_admin_bar_view_link', 100 );
 
 	// Redirect the old url of amp page to the updated url.
 	add_filter( 'old_slug_redirect_url', 'amp_redirect_old_slug_to_new_url' );
@@ -314,7 +400,7 @@ function amp_force_query_var_value( $query_vars ) {
 }
 
 /**
- * Conditionally add AMP actions or render the 'paired mode' template(s).
+ * Conditionally add AMP actions or render the transitional mode template(s).
  *
  * If the request is for an AMP page and this is in 'canonical mode,' redirect to the non-AMP page.
  * It won't need this plugin's template system, nor the frontend actions like the 'rel' link.
@@ -331,7 +417,7 @@ function amp_maybe_add_actions() {
 		return;
 	}
 
-	// The remaining logic here is for paired mode running in themes that don't support AMP, the template system in AMP<=0.6.
+	// The remaining logic here is for transitional mode running in themes that don't support AMP, the template system in AMP<=0.6.
 	global $wp_query;
 	if ( ! ( is_singular() || $wp_query->is_posts_page ) || is_feed() ) {
 		return;
@@ -348,7 +434,7 @@ function amp_maybe_add_actions() {
 	if ( ! post_supports_amp( $post ) ) {
 		if ( $is_amp_endpoint ) {
 			/*
-			 * Temporary redirect is used for admin users because classic mode and AMP support can be enabled by user at any time,
+			 * Temporary redirect is used for admin users because reader mode and AMP support can be enabled by user at any time,
 			 * so they will be able to make AMP available for this URL and see the change without wrestling with the redirect cache.
 			 */
 			wp_safe_redirect( get_permalink( $post->ID ), current_user_can( 'manage_options' ) ? 302 : 301 );
@@ -421,13 +507,13 @@ function amp_correct_query_when_is_front_page( WP_Query $query ) {
  *      add_theme_support( AMP_Theme_Support::SLUG );
  *
  * This will serve templates in native AMP, allowing you to use AMP components in your theme templates.
- * If you want to make available in paired mode, where templates are served in AMP or non-AMP documents, do:
+ * If you want to make available in transitional mode, where templates are served in AMP or non-AMP documents, do:
  *
  *      add_theme_support( AMP_Theme_Support::SLUG, array(
  *          'paired' => true,
  *      ) );
  *
- * Paired mode is also implied if you define a template_dir:
+ * Transitional mode is also implied if you define a template_dir:
  *
  *      add_theme_support( AMP_Theme_Support::SLUG, array(
  *          'template_dir' => 'amp',
@@ -468,7 +554,7 @@ function amp_is_canonical() {
 		return empty( $args['paired'] );
 	}
 
-	// If there is a template_dir, then paired mode is implied.
+	// If there is a template_dir, then transitional mode is implied.
 	return empty( $args['template_dir'] );
 }
 

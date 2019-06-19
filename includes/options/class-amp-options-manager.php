@@ -234,7 +234,7 @@ class AMP_Options_Manager {
 	 */
 	public static function check_supported_post_type_update_errors() {
 
-		// If all templates are supported then skip check since all post types are also supported. This option only applies with native/paired theme support.
+		// If all templates are supported then skip check since all post types are also supported. This option only applies with native/transitional theme support.
 		if ( self::get_option( 'all_templates_supported', false ) && 'disabled' !== self::get_option( 'theme_support' ) ) {
 			return;
 		}
@@ -379,6 +379,9 @@ class AMP_Options_Manager {
 			.amp-welcome-notice {
 				padding: 38px;
 			}
+			.amp-welcome-notice + .notice {
+				clear: both;
+			}
 			.amp-welcome-icon-holder {
 				width: 200px;
 				height: 200px;
@@ -521,7 +524,7 @@ class AMP_Options_Manager {
 			$theme_support['paired'] = 'paired' === $template_mode;
 			add_theme_support( AMP_Theme_Support::SLUG, $theme_support );
 		} else {
-			remove_theme_support( AMP_Theme_Support::SLUG ); // So that the amp_get_permalink() will work for classic URL.
+			remove_theme_support( AMP_Theme_Support::SLUG ); // So that the amp_get_permalink() will work for reader mode URL.
 		}
 
 		$url = amp_admin_get_preview_permalink();
@@ -534,7 +537,7 @@ class AMP_Options_Manager {
 			if ( is_wp_error( $validation ) ) {
 				$review_messages[] = esc_html(
 					sprintf(
-						/* translators: %1$s is the error message, %2$s is the error code */
+						/* translators: 1: error message. 2: error code. */
 						__( 'However, there was an error when checking the AMP validity for your site.', 'amp' ),
 						$validation->get_error_message(),
 						$validation->get_error_code()
@@ -613,7 +616,7 @@ class AMP_Options_Manager {
 					if ( $new_errors > 0 && $invalid_url_screen_url ) {
 						$message .= ' ' . wp_kses_post(
 							sprintf(
-								/* translators: %1$s is URL to review issues, %2$s is count of new errors */
+								/* translators: 1: URL to review issues. 2: count of new errors. */
 								_n(
 									'Please also <a href="%1$s">review %2$s issue</a> which may need to be fixed (for one URL at least).',
 									'Please also <a href="%1$s">review %2$s issues</a> which may need to be fixed (for one URL at least).',
@@ -639,7 +642,7 @@ class AMP_Options_Manager {
 				}
 				break;
 			case 'paired':
-				$message = esc_html__( 'Paired mode activated!', 'amp' );
+				$message = esc_html__( 'Transitional mode activated!', 'amp' );
 				if ( $review_messages ) {
 					$message .= ' ' . join( ' ', $review_messages );
 				}
@@ -648,7 +651,7 @@ class AMP_Options_Manager {
 				$message = wp_kses_post(
 					sprintf(
 						/* translators: %s is an AMP URL */
-						__( 'Classic mode activated! View the <a href="%s">AMP version of a recent post</a>. It is recommended that you upgrade to Native or Paired mode.', 'amp' ),
+						__( 'Reader mode activated! View the <a href="%s">AMP version of a recent post</a>. It is recommended that you upgrade to Native or Transitional mode.', 'amp' ),
 						esc_url( $url )
 					)
 				);
