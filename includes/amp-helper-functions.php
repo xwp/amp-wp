@@ -422,7 +422,7 @@ function amp_register_default_scripts( $wp_scripts ) {
 	 * Polyfill dependencies that are registered in Gutenberg and WordPress 5.0.
 	 * Note that Gutenberg will override these at wp_enqueue_scripts if it is active.
 	 */
-	$handles = [ 'wp-i18n', 'wp-dom-ready', 'wp-server-side-render' ];
+	$handles = [ 'wp-i18n', 'wp-dom-ready', 'wp-polyfill', 'wp-server-side-render', 'wp-url' ];
 	foreach ( $handles as $handle ) {
 		if ( ! isset( $wp_scripts->registered[ $handle ] ) ) {
 			$asset_file   = AMP__DIR__ . '/assets/js/' . $handle . '.asset.php';
@@ -462,16 +462,17 @@ function amp_register_default_scripts( $wp_scripts ) {
 		$handle,
 		sprintf(
 			'if ( ! Element.prototype.attachShadow ) { const script = document.createElement( "script" ); script.src = %s; script.async = true; document.head.appendChild( script ); }',
-			wp_json_encode( 'https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.4.0/webcomponents-bundle.js' )
+			wp_json_encode( 'https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.4.1/webcomponents-bundle.js' )
 		),
 		'after'
 	);
+
 	// App shell library.
 	$handle = 'amp-wp-app-shell';
 	$wp_scripts->add(
 		$handle,
 		amp_get_asset_url( 'js/amp-wp-app-shell.js' ),
-		array( 'amp-shadow' ),
+		[ 'amp-shadow' ],
 		AMP__VERSION . ( WP_DEBUG ? '-' . md5( file_get_contents( AMP__DIR__ . '/assets/js/amp-wp-app-shell.js' ) ) : '' ) // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents, WordPress.WP.AlternativeFunctions.file_system_read_file_get_contents
 	);
 	$wp_scripts->add_data(
@@ -558,14 +559,14 @@ function amp_render_scripts( $scripts ) {
  * @return string Script loader tag.
  */
 function amp_filter_script_loader_tag( $tag, $handle ) {
-	$prefix = 'https://cdn.ampproject.org/';
-	$src    = wp_scripts()->registered[ $handle ]->src;
+	$prefix     = 'https://cdn.ampproject.org/';
+	$src        = wp_scripts()->registered[ $handle ]->src;
 	$attributes = wp_scripts()->get_data( $handle, 'amp_script_attributes' );
 	if ( empty( $attributes ) && 0 === strpos( $src, $prefix ) ) {
 		// All scripts from AMP CDN should be loaded async.
-		$attributes = array(
+		$attributes = [
 			'async' => true,
-		);
+		];
 	}
 	if ( empty( $attributes ) ) {
 		return $tag;
@@ -933,6 +934,8 @@ function amp_get_content_sanitizers( $post = null ) {
 		'AMP_Style_Sanitizer'             => [
 			'include_manifest_comment' => ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ? 'always' : 'when_excessive',
 		],
+		'AMP_Meta_Sanitizer'              => [],
+		'AMP_Layout_Sanitizer'            => [],
 		'AMP_Tag_And_Attribute_Sanitizer' => [], // Note: This whitelist sanitizer must come at the end to clean up any remaining issues the other sanitizers didn't catch.
 	];
 
@@ -989,7 +992,7 @@ function amp_get_content_sanitizers( $post = null ) {
 	}
 
 	// Force style sanitizer and whitelist sanitizer to be at end.
-	foreach ( [ 'AMP_Style_Sanitizer', 'AMP_Tag_And_Attribute_Sanitizer' ] as $class_name ) {
+	foreach ( [ 'AMP_Style_Sanitizer', 'AMP_Meta_Sanitizer', 'AMP_Tag_And_Attribute_Sanitizer' ] as $class_name ) {
 		if ( isset( $sanitizers[ $class_name ] ) ) {
 			$sanitizer = $sanitizers[ $class_name ];
 			unset( $sanitizers[ $class_name ] );
@@ -1258,10 +1261,13 @@ function amp_start_app_shell_content() {
 	if ( ! isset( $support_args['app_shell'] ) ) {
 		return;
 	}
+
 	printf( '<div id="%s">', esc_attr( AMP_Theme_Support::APP_SHELL_CONTENT_ELEMENT_ID ) );
+
 	// Start output buffering if requesting outer shell, since all content will be omitted from the response.
 	if ( 'outer' === AMP_Theme_Support::get_requested_app_shell_component() ) {
 		$content_placeholder = '<p>' . esc_html__( 'Loading&hellip;', 'amp' ) . '</p>';
+
 		/**
 		 * Filters the content which is shown in the app shell for the content before it is loaded.
 		 *
@@ -1273,6 +1279,7 @@ function amp_start_app_shell_content() {
 		 * @param string $content_placeholder Content placeholder.
 		 */
 		echo apply_filters( 'amp_app_shell_content_placeholder', $content_placeholder ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+
 		ob_start();
 	}
 }
@@ -1288,11 +1295,13 @@ function amp_end_app_shell_content() {
 	if ( ! isset( $support_args['app_shell'] ) ) {
 		return;
 	}
+
 	// Clean output buffer if requesting outer shell, since all content will be omitted from the response.
 	if ( 'outer' === AMP_Theme_Support::get_requested_app_shell_component() ) {
 		ob_end_clean();
 	}
-	echo '</div><!-- #amp-app-shell-content -->';
+
+	printf( '</div><!-- #%s -->', esc_attr( AMP_Theme_Support::APP_SHELL_CONTENT_ELEMENT_ID ) );
 }
 
 /**
