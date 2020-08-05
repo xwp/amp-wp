@@ -35,21 +35,6 @@ class AMP_Theme_Support {
 	const SLUG = 'amp';
 
 	/**
-	 * Query var for requesting the inner or outer app shell.
-	 *
-	 * @todo This can go into the AMP_Service_Worker class or rather an AMP_App_Shell class.
-	 * @var string
-	 */
-	const APP_SHELL_COMPONENT_QUERY_VAR = 'amp_app_shell_component';
-
-	/**
-	 * ID for element that contains the content for app shell.
-	 *
-	 * @var string
-	 */
-	const APP_SHELL_CONTENT_ELEMENT_ID = 'amp-app-shell-content';
-
-	/**
 	 * Slug identifying standard website mode.
 	 *
 	 * @since 1.2
@@ -169,8 +154,6 @@ class AMP_Theme_Support {
 
 		// Ensure extra theme support for core themes is in place.
 		AMP_Core_Theme_Sanitizer::extend_theme_support();
-
-		add_action( 'parse_query', [ __CLASS__, 'init_app_shell' ], 9 );
 
 		/*
 		* Note that wp action is used instead of template_redirect because some themes/plugins output
@@ -386,70 +369,6 @@ class AMP_Theme_Support {
 			if ( method_exists( $sanitizer_class, 'add_buffering_hooks' ) ) {
 				call_user_func( [ $sanitizer_class, 'add_buffering_hooks' ], $args );
 			}
-		}
-	}
-
-	/**
-	 * Init app shell.
-	 *
-	 * @since 1.1
-	 */
-	public static function init_app_shell() {
-		$theme_support = self::get_theme_support_args();
-		if ( ! isset( $theme_support['app_shell'] ) ) {
-			return;
-		}
-
-		$requested_app_shell_component = self::get_requested_app_shell_component();
-
-		// When inner app shell is requested, it is always an AMP request. Do not allow AMP when getting outer app shell for now (but this should be allowed in the future).
-		if ( 'outer' === $requested_app_shell_component ) {
-			add_action(
-				'template_redirect',
-				function() {
-					if ( ! is_amp_endpoint() ) {
-						return;
-					}
-					wp_die(
-						esc_html__( 'Outer app shell can only be requested of the non-AMP version (thus requires Transitional mode).', 'amp' ),
-						esc_html__( 'AMP Outer App Shell Problem', 'amp' ),
-						[ 'response' => 400 ]
-					);
-				}
-			);
-		}
-
-		// @todo This query param should be standardized and then this can be handled in the same place as WP_Service_Worker_Navigation_Routing_Component::filter_title_for_streaming_header().
-		if ( 'outer' === $requested_app_shell_component ) {
-			add_filter(
-				'pre_get_document_title',
-				function() {
-					return __( 'Loading...', 'amp' );
-				}
-			);
-		}
-
-		// Enqueue scripts for (outer) app shell, including precached app shell and normal site navigation prior to service worker installation.
-		if ( 'inner' !== $requested_app_shell_component ) {
-			add_action(
-				'wp_enqueue_scripts',
-				function() use ( $requested_app_shell_component ) {
-					if ( is_amp_endpoint() ) {
-						return;
-					}
-					wp_enqueue_script( 'amp-shadow' );
-					wp_enqueue_script( 'amp-wp-app-shell' );
-
-					$exports = [
-						'contentElementId'  => AMP_Theme_Support::APP_SHELL_CONTENT_ELEMENT_ID,
-						'homeUrl'           => home_url( '/' ),
-						'adminUrl'          => admin_url( '/' ),
-						'componentQueryVar' => AMP_Theme_Support::APP_SHELL_COMPONENT_QUERY_VAR,
-						'isOuterAppShell'   => 'outer' === $requested_app_shell_component,
-					];
-					wp_add_inline_script( 'amp-wp-app-shell', sprintf( 'var ampAppShell = %s;', wp_json_encode( $exports ) ), 'before' );
-				}
-			);
 		}
 	}
 
@@ -1942,28 +1861,6 @@ class AMP_Theme_Support {
 	}
 
 	/**
-	 * Get the requested app shell component (either inner or outer).
-	 *
-	 * @return string|null App shell component.
-	 */
-	public static function get_requested_app_shell_component() {
-		if ( ! isset( AMP_HTTP::$purged_amp_query_vars[ self::APP_SHELL_COMPONENT_QUERY_VAR ] ) ) {
-			return null;
-		}
-
-		$theme_support_args = self::get_theme_support_args();
-		if ( ! isset( $theme_support_args['app_shell'] ) ) {
-			return null;
-		}
-
-		$component = AMP_HTTP::$purged_amp_query_vars[ self::APP_SHELL_COMPONENT_QUERY_VAR ];
-		if ( in_array( $component, [ 'inner', 'outer' ], true ) ) {
-			return $component;
-		}
-		return null;
-	}
-
-	/**
 	 * Prepare inner app shell.
 	 *
 	 * @param DOMElement $content_element Content element.
@@ -2124,7 +2021,7 @@ class AMP_Theme_Support {
 		}
 
 		// Get request for shadow DOM.
-		$app_shell_component = self::get_requested_app_shell_component();
+		$app_shell_component = AMP_App_Shell::get_requested_app_shell_component();
 
 		$args = array_merge(
 			[
@@ -2168,10 +2065,10 @@ class AMP_Theme_Support {
 		// Remove the children of the content if requesting the outer app shell.
 		$content_element = null;
 		if ( $app_shell_component ) {
-			$content_element = $dom->getElementById( self::APP_SHELL_CONTENT_ELEMENT_ID );
+			$content_element = $dom->getElementById( AMP_App_Shell::CONTENT_ELEMENT_ID );
 			if ( ! $content_element ) {
 				status_header( 500 );
-				return esc_html__( 'Unable to locate APP_SHELL_CONTENT_ELEMENT_ID.', 'amp' );
+				return esc_html__( 'Unable to locate AMP_App_Shell::CONTENT_ELEMENT_ID.', 'amp' );
 			}
 			if ( 'inner' === $app_shell_component ) {
 				self::prepare_inner_app_shell_document( $content_element );

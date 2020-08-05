@@ -45,7 +45,7 @@ class AMP_Service_Worker {
 			add_filter(
 				'wp_service_worker_navigation_route',
 				function ( $navigation_route ) {
-					$navigation_route['url'] = add_query_arg( AMP_Theme_Support::APP_SHELL_COMPONENT_QUERY_VAR, 'outer', home_url( '/' ) );
+					$navigation_route['url'] = add_query_arg( AMP_App_Shell::COMPONENT_QUERY_VAR, 'outer', home_url( '/' ) );
 					return $navigation_route;
 				}
 			);
@@ -58,7 +58,7 @@ class AMP_Service_Worker {
 			 */
 			$add_inner_app_shell_component = function( $precache_entry ) {
 				$precache_entry['url'] = add_query_arg(
-					AMP_Theme_Support::APP_SHELL_COMPONENT_QUERY_VAR,
+					AMP_App_Shell::COMPONENT_QUERY_VAR,
 					'inner',
 					$precache_entry['url']
 				);
