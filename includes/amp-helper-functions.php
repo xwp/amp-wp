@@ -932,6 +932,13 @@ function amp_register_default_scripts( $wp_scripts ) {
 		[],
 		null
 	);
+	$wp_scripts->add_data(
+		$handle,
+		'amp_script_attributes',
+		[
+			'async' => true,
+		]
+	);
 
 	// Register all AMP components as defined in the spec.
 	foreach ( AMP_Allowed_Tags_Generated::get_extension_specs() as $extension_name => $extension_spec ) {
@@ -1033,8 +1040,8 @@ function amp_render_scripts( $scripts ) {
  * @return string Script loader tag.
  */
 function amp_filter_script_loader_tag( $tag, $handle ) {
-	$prefix     = 'https://cdn.ampproject.org/';
-	$src        = wp_scripts()->registered[ $handle ]->src;
+	$prefix = 'https://cdn.ampproject.org/';
+	$src    = wp_scripts()->registered[ $handle ]->src;
 	if ( 0 !== strpos( $src, $prefix ) ) {
 		return $tag;
 	}
