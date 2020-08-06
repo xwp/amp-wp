@@ -72,20 +72,6 @@ const ampValidation = {
 	],
 };
 
-const ampWpAppShell = {
-	...sharedConfig,
-	entry: {
-		'amp-wp-app-shell': './assets/src/amp-wp-app-shell/index.js',
-	},
-	plugins: [
-		...sharedConfig.plugins,
-		new WebpackBar( {
-			name: 'AMP WP App Shell',
-			color: '#7F3f9c',
-		} ),
-	],
-};
-
 const blockEditor = {
 	...sharedConfig,
 	externals: {
@@ -343,7 +329,6 @@ const mobileRedirection = {
 
 module.exports = [
 	ampValidation,
-	ampWpAppShell,
 	blockEditor,
 	classicEditor,
 	admin,
