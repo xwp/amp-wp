@@ -874,7 +874,7 @@ class Test_AMP_Validation_Manager extends WP_UnitTestCase {
 
 		// When sanitization is accepted by default.
 		$this->accept_sanitization_by_default( true );
-		$expected_notice_non_accepted_errors = 'There is content which fails AMP validation. You will have to remove the invalid markup (or allow the plugin to remove it) to serve AMP.';
+		$expected_notice_non_accepted_errors = 'There is content which fails AMP validation. In order for AMP to be served you will have to remove the invalid markup or allow the plugin to remove it.';
 		$this->assertStringContains( 'notice notice-warning', $output );
 		$this->assertStringContains( '<code>script</code>', $output );
 		$this->assertStringContains( $expected_notice_non_accepted_errors, $output );
@@ -882,7 +882,7 @@ class Test_AMP_Validation_Manager extends WP_UnitTestCase {
 		// When auto-accepting validation errors, if there are unaccepted validation errors, there should be a notice because this will block serving an AMP document.
 		AMP_Options_Manager::update_option( Option::THEME_SUPPORT, AMP_Theme_Support::STANDARD_MODE_SLUG );
 		$output = get_echo( [ 'AMP_Validation_Manager', 'print_edit_form_validation_status' ], [ $post ] );
-		$this->assertStringContains( 'There is content which fails AMP validation. You will have to remove the invalid markup (or allow the plugin to remove it) to serve AMP.', $output );
+		$this->assertStringContains( 'There is content which fails AMP validation. In order for AMP to be served you will have to remove the invalid markup or allow the plugin to remove it.', $output );
 
 		/*
 		 * When there are 'Rejected' or 'New Rejected' errors, there should be a message that explains that this will serve a non-AMP URL.
@@ -2478,9 +2478,10 @@ class Test_AMP_Validation_Manager extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'post_id', $r );
 		$this->assertEquals( AMP_Validated_URL_Post_Type::POST_TYPE_SLUG, get_post_type( $r['post_id'] ) );
 		$this->assertEquals( $r['url'], AMP_Validated_URL_Post_Type::get_url_from_post( $r['post_id'] ) );
-		$this->assertEquals( $php_error, json_decode( get_post_meta( $r['post_id'], '_amp_php_fatal_error', true ), true ) );
-		$this->assertEquals( $queried_object, get_post_meta( $r['post_id'], '_amp_queried_object', true ) );
-		$this->assertEquals( $stylesheets, json_decode( get_post_meta( $r['post_id'], '_amp_stylesheets', true ), true ) );
+		$this->assertEquals( $php_error, json_decode( get_post_meta( $r['post_id'], AMP_Validated_URL_Post_Type::PHP_FATAL_ERROR_POST_META_KEY, true ), true ) );
+		$this->assertEquals( $queried_object, get_post_meta( $r['post_id'], AMP_Validated_URL_Post_Type::QUERIED_OBJECT_POST_META_KEY, true ) );
+		$this->assertEquals( $stylesheets, json_decode( get_post_meta( $r['post_id'], AMP_Validated_URL_Post_Type::STYLESHEETS_POST_META_KEY, true ), true ) );
+		$this->assertEquals( AMP_Validated_URL_Post_Type::get_validated_environment(), get_post_meta( $r['post_id'], AMP_Validated_URL_Post_Type::VALIDATED_ENVIRONMENT_POST_META_KEY, true ) );
 
 		$updated_validated_url = home_url( '/bar/' );
 		$previous_post_id      = $r['post_id'];

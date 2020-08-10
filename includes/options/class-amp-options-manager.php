@@ -42,6 +42,7 @@ class AMP_Options_Manager {
 	public static function init() {
 		add_action( 'admin_notices', [ __CLASS__, 'render_php_css_parser_conflict_notice' ] );
 		add_action( 'admin_notices', [ __CLASS__, 'insecure_connection_notice' ] );
+		add_action( 'admin_notices', [ __CLASS__, 'reader_theme_fallback_notice' ] );
 	}
 
 	/**
@@ -321,11 +322,6 @@ class AMP_Options_Manager {
 		];
 		if ( isset( $new_options[ Option::THEME_SUPPORT ] ) && in_array( $new_options[ Option::THEME_SUPPORT ], $recognized_theme_supports, true ) ) {
 			$options[ Option::THEME_SUPPORT ] = $new_options[ Option::THEME_SUPPORT ];
-
-			// If this option was changed, display a notice with the new template mode.
-			if ( self::get_option( Option::THEME_SUPPORT ) !== $new_options[ Option::THEME_SUPPORT ] ) {
-				add_action( 'update_option_' . self::OPTION_NAME, [ __CLASS__, 'handle_updated_theme_support_option' ] );
-			}
 		}
 
 		// Validate post type support.
@@ -363,47 +359,21 @@ class AMP_Options_Manager {
 
 		// Validate analytics.
 		if ( isset( $new_options[ Option::ANALYTICS ] ) && $new_options[ Option::ANALYTICS ] !== $options[ Option::ANALYTICS ] ) {
-			foreach ( $new_options[ Option::ANALYTICS ] as $data ) {
+			$new_analytics_option = [];
 
-				// Check save/delete pre-conditions and proceed if correct.
-				if ( empty( $data['type'] ) || empty( $data['config'] ) ) {
-					self::add_settings_error( self::OPTION_NAME, 'missing_analytics_vendor_or_config', __( 'Missing vendor type or config.', 'amp' ) );
+			foreach ( $new_options[ Option::ANALYTICS ] as $id => $data ) {
+				if ( empty( $data['config'] ) || ! AMP_HTML_Utils::is_valid_json( $data['config'] ) ) {
+					// Bad JSON or missing config.
 					continue;
 				}
 
-				// Validate JSON configuration.
-				$is_valid_json = AMP_HTML_Utils::is_valid_json( $data['config'] );
-				if ( ! $is_valid_json ) {
-					self::add_settings_error( self::OPTION_NAME, 'invalid_analytics_config_json', __( 'Invalid analytics config JSON.', 'amp' ) );
-					continue;
-				}
-
-				$entry_vendor_type = preg_replace( '/[^a-zA-Z0-9_\-]/', '', $data['type'] );
-				$entry_config      = trim( $data['config'] );
-
-				if ( ! empty( $data['id'] ) && '__new__' !== $data['id'] ) {
-					$entry_id = sanitize_key( $data['id'] );
-				} else {
-
-					// Generate a hash string to uniquely identify this entry.
-					$entry_id = substr( md5( $entry_vendor_type . $entry_config ), 0, 12 );
-
-					// Avoid duplicates.
-					if ( isset( $options[ Option::ANALYTICS ][ $entry_id ] ) ) {
-						self::add_settings_error( self::OPTION_NAME, 'duplicate_analytics_entry', __( 'Duplicate analytics entry found.', 'amp' ) );
-						continue;
-					}
-				}
-
-				if ( isset( $data['delete'] ) ) {
-					unset( $options[ Option::ANALYTICS ][ $entry_id ] );
-				} else {
-					$options[ Option::ANALYTICS ][ $entry_id ] = [
-						'type'   => $entry_vendor_type,
-						'config' => $entry_config,
-					];
-				}
+				$new_analytics_option[ sanitize_key( $id ) ] = [
+					'type'   => ! empty( $data['type'] ) ? preg_replace( '/[^a-zA-Z0-9_\-]/', '', $data['type'] ) : '',
+					'config' => trim( $data['config'] ),
+				];
 			}
+
+			$options[ OPTION::ANALYTICS ] = $new_analytics_option;
 		}
 
 		if ( isset( $new_options[ Option::READER_THEME ] ) ) {
@@ -467,57 +437,13 @@ class AMP_Options_Manager {
 	}
 
 	/**
-	 * Handle analytics submission.
-	 */
-	public static function handle_analytics_submit() {
-
-		// Request must come from user with right capabilities.
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Sorry, you do not have the necessary permissions to perform this action', 'amp' ) );
-		}
-
-		// Ensure request is coming from analytics option form.
-		check_admin_referer( 'analytics-options', 'analytics-options' );
-
-		if ( isset( $_POST[ self::OPTION_NAME ][ Option::ANALYTICS ] ) ) {
-			self::update_option( Option::ANALYTICS, wp_unslash( $_POST[ self::OPTION_NAME ][ Option::ANALYTICS ] ) );
-
-			$errors = get_settings_errors( self::OPTION_NAME );
-			if ( empty( $errors ) ) {
-				self::add_settings_error( self::OPTION_NAME, 'settings_updated', __( 'The analytics entry was successfully saved!', 'amp' ), 'updated' );
-				$errors = get_settings_errors( self::OPTION_NAME );
-			}
-			set_transient( 'settings_errors', $errors );
-		}
-
-		/*
-		 * Redirect to keep the user in the analytics options page.
-		 * Wrap in is_admin() to enable phpunit tests to exercise this code.
-		 */
-		wp_safe_redirect( admin_url( 'admin.php?page=amp-analytics-options&settings-updated=1' ) );
-		exit;
-	}
-
-	/**
-	 * Update analytics options.
-	 *
-	 * @codeCoverageIgnore
-	 * @deprecated
-	 * @param array $data Unsanitized unslashed data.
-	 * @return bool Whether options were updated.
-	 */
-	public static function update_analytics_options( $data ) {
-		_deprecated_function( __METHOD__, '0.6', __CLASS__ . '::update_option' );
-		return self::update_option( Option::ANALYTICS, wp_unslash( $data ) );
-	}
-
-	/**
 	 * Render PHP-CSS-Parser conflict notice.
 	 *
 	 * @return void
 	 */
 	public static function render_php_css_parser_conflict_notice() {
-		if ( 'toplevel_page_' . self::OPTION_NAME !== get_current_screen()->id ) {
+		$current_screen = get_current_screen();
+		if ( ! ( $current_screen instanceof WP_Screen ) || 'toplevel_page_' . self::OPTION_NAME !== $current_screen->id ) {
 			return;
 		}
 
@@ -560,6 +486,8 @@ class AMP_Options_Manager {
 	 * @return void
 	 */
 	public static function insecure_connection_notice() {
+		$current_screen = get_current_screen();
+
 		// is_ssl() only tells us whether the admin backend uses HTTPS here, so we add a few more sanity checks.
 		$uses_ssl = (
 			is_ssl()
@@ -569,7 +497,7 @@ class AMP_Options_Manager {
 			( strpos( get_bloginfo( 'url' ), 'https' ) === 0 )
 		);
 
-		if ( ! $uses_ssl && 'toplevel_page_' . self::OPTION_NAME === get_current_screen()->id ) {
+		if ( ! $uses_ssl && $current_screen instanceof WP_Screen && 'toplevel_page_' . self::OPTION_NAME === $current_screen->id ) {
 			printf(
 				'<div class="notice notice-warning"><p>%s</p></div>',
 				wp_kses(
@@ -588,139 +516,42 @@ class AMP_Options_Manager {
 	}
 
 	/**
-	 * Adds a message for an update of the theme support setting.
+	 * Outputs an admin notice if the AMP Legacy Reader theme is used as a fallback.
 	 */
-	public static function handle_updated_theme_support_option() {
-		$template_mode = self::get_option( Option::THEME_SUPPORT );
+	public static function reader_theme_fallback_notice() {
+		$current_screen = get_current_screen();
 
-		$url = amp_admin_get_preview_permalink();
+		if ( ! ( $current_screen instanceof WP_Screen ) || ! in_array( $current_screen->id, [ 'themes', 'toplevel_page_' . self::OPTION_NAME ], true ) ) {
+			return;
+		}
 
-		$notice_type     = 'updated';
-		$review_messages = [];
-		if ( $url ) {
-			$validation = AMP_Validation_Manager::validate_url_and_store( $url );
+		$reader_themes = new ReaderThemes();
 
-			if ( is_wp_error( $validation ) ) {
-				$review_messages[] = esc_html__( 'However, there was an error when checking the AMP validity for your site.', 'amp' );
-				$review_messages[] = AMP_Validation_Manager::get_validate_url_error_message( $validation->get_error_code(), $validation->get_error_message() );
-				$notice_type       = 'error';
-			} elseif ( is_array( $validation ) ) {
-				$new_errors      = 0;
-				$rejected_errors = 0;
-
-				$errors = wp_list_pluck( $validation['results'], 'error' );
-				foreach ( $errors as $error ) {
-					$sanitization    = AMP_Validation_Error_Taxonomy::get_validation_error_sanitization( $error );
-					$is_new_rejected = AMP_Validation_Error_Taxonomy::VALIDATION_ERROR_NEW_REJECTED_STATUS === $sanitization['status'];
-					if ( $is_new_rejected || AMP_Validation_Error_Taxonomy::VALIDATION_ERROR_NEW_ACCEPTED_STATUS === $sanitization['status'] ) {
-						$new_errors++;
-					}
-					if ( $is_new_rejected || AMP_Validation_Error_Taxonomy::VALIDATION_ERROR_ACK_REJECTED_STATUS === $sanitization['status'] ) {
-						$rejected_errors++;
-					}
-				}
-
-				$invalid_url_post_id    = $validation['post_id'];
-				$invalid_url_screen_url = ! is_wp_error( $invalid_url_post_id ) ? get_edit_post_link( $invalid_url_post_id, 'raw' ) : null;
-
-				if ( $rejected_errors > 0 ) {
-					$notice_type = 'error';
-
-					$message = esc_html(
-						sprintf(
-							/* translators: %s is count of rejected errors */
-							_n(
-								'However, AMP is not yet available due to %s validation error (for one URL at least).',
-								'However, AMP is not yet available due to %s validation errors (for one URL at least).',
-								number_format_i18n( $rejected_errors ),
-								'amp'
-							),
-							$rejected_errors,
-							esc_url( $invalid_url_screen_url )
-						)
+		if ( $reader_themes->using_fallback_theme() && current_user_can( 'manage_options' ) ) {
+			$selected_theme = self::get_option( Option::READER_THEME );
+			$error_message  = sprintf(
+				/* translators: 1: slug of the Reader theme, 2: the URL for the reader theme selection UI */
+				__( 'The AMP Reader theme %1$s cannot be found. Your site is currently falling back to using the Legacy templates for AMP pages. Please <a href="%2$s">re-select</a> the desired Reader theme.', 'amp' ),
+				"<code>{$selected_theme}</code>",
+				esc_url( add_query_arg( 'page', self::OPTION_NAME, admin_url( 'admin.php' ) ) . '#reader-themes-drawer' )
+			);
+			?>
+			<div class="notice notice-warning">
+				<p>
+					<?php
+					echo wp_kses(
+						$error_message,
+						[
+							'code' => [],
+							'a'    => [
+								'href' => true,
+							],
+						]
 					);
-
-					if ( $invalid_url_screen_url ) {
-						$message .= ' ' . sprintf(
-							/* translators: %s is URL to review issues */
-							_n(
-								'<a href="%s">Review Issue</a>.',
-								'<a href="%s">Review Issues</a>.',
-								$rejected_errors,
-								'amp'
-							),
-							esc_url( $invalid_url_screen_url )
-						);
-					}
-
-					$review_messages[] = $message;
-				} else {
-					$message = sprintf(
-						/* translators: %s is an AMP URL */
-						__( 'View an <a href="%s">AMP version of your site</a>.', 'amp' ),
-						esc_url( $url )
-					);
-
-					if ( $new_errors > 0 && $invalid_url_screen_url ) {
-						$message .= ' ' . sprintf(
-							/* translators: 1: URL to review issues. 2: count of new errors. */
-							_n(
-								'Please also <a href="%1$s">review %2$s issue</a> which may need to be fixed (for one URL at least).',
-								'Please also <a href="%1$s">review %2$s issues</a> which may need to be fixed (for one URL at least).',
-								$new_errors,
-								'amp'
-							),
-							esc_url( $invalid_url_screen_url ),
-							number_format_i18n( $new_errors )
-						);
-					}
-
-					$review_messages[] = $message;
-				}
-			}
+					?>
+				</p>
+			</div>
+			<?php
 		}
-
-		switch ( $template_mode ) {
-			case AMP_Theme_Support::STANDARD_MODE_SLUG:
-				$message = esc_html__( 'Standard mode activated!', 'amp' );
-				if ( $review_messages ) {
-					$message .= ' ' . implode( ' ', $review_messages );
-				}
-				break;
-			case AMP_Theme_Support::TRANSITIONAL_MODE_SLUG:
-				$message = esc_html__( 'Transitional mode activated!', 'amp' );
-				if ( $review_messages ) {
-					$message .= ' ' . implode( ' ', $review_messages );
-				}
-				break;
-			case AMP_Theme_Support::READER_MODE_SLUG:
-				$message = sprintf(
-					/* translators: %s is an AMP URL */
-					__( 'Reader mode activated! View the <a href="%s">AMP version of a recent post</a>. It is recommended that you upgrade to Standard or Transitional mode.', 'amp' ),
-					esc_url( $url )
-				);
-				break;
-		}
-
-		if ( isset( $message ) ) {
-			self::add_settings_error( self::OPTION_NAME, 'template_mode_updated', wp_kses_post( $message ), $notice_type );
-		}
-	}
-
-	/**
-	 * Register a settings error to be displayed to the user.
-	 *
-	 * @see add_settings_error()
-	 *
-	 * @param string $setting Slug title of the setting to which this error applies.
-	 * @param string $code    Slug-name to identify the error. Used as part of 'id' attribute in HTML output.
-	 * @param string $message The formatted message text to display to the user (will be shown inside styled
-	 *                        `<div>` and `<p>` tags).
-	 * @param string $type    Optional. Message type, controls HTML class. Possible values include 'error',
-	 *                        'success', 'warning', 'info'. Default 'error'.
-	 */
-	private static function add_settings_error( $setting, $code, $message, $type = 'error' ) {
-		require_once ABSPATH . 'wp-admin/includes/template.php';
-		add_settings_error( $setting, $code, $message, $type );
 	}
 }

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import PropTypes from 'prop-types';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -17,8 +18,8 @@ import { SelectControl } from '@wordpress/components';
  */
 import { Options } from '../components/options-context-provider';
 import { ConditionalDetails } from '../components/conditional-details';
-import { Selectable } from '../components/selectable';
 import { SiteSettings } from '../components/site-settings-provider';
+import { AMPDrawer } from '../components/amp-drawer';
 
 /**
  * Renders the formatted date for when a plugin was suppressed.
@@ -121,6 +122,14 @@ SuppressedPluginVersion.propTypes = {
  * @param {Array} props.errors
  */
 function ValidationErrorDetails( { errors } ) {
+	if ( errors.length === 0 ) {
+		return (
+			<p>
+				{ __( 'No validation errors yet detected.', 'amp' ) }
+			</p>
+		);
+	}
+
 	return (
 		<details>
 			<summary>
@@ -139,15 +148,15 @@ function ValidationErrorDetails( { errors } ) {
 			</summary>
 			<ul>
 				{ errors.map( ( error ) => {
-					const className = [
-						`error-${ error.is_removed ? 'removed' : 'kept' }`,
-						`error-${ error.is_reviewed ? 'reviewed' : 'unreviewed' }`,
-					].join( ' ' );
-
 					const WrapperElement = ! error.is_reviewed ? 'strong' : Fragment;
 
 					return (
-						<li key={ error.term.term_id } className={ className }>
+						<li
+							key={ error.term.term_id }
+							className={ classnames(
+								`error-${ error.is_removed ? 'removed' : 'kept' }`,
+								`error-${ error.is_reviewed ? 'reviewed' : 'unreviewed' }`,
+							) }>
 							<WrapperElement>
 								<a href={ error.edit_url } target="_blank" rel="noreferrer" title={ error.tooltip }>
 									<span dangerouslySetInnerHTML={ { __html: error.title } } />
@@ -188,13 +197,40 @@ function PluginRow( { pluginKey, pluginDetails } ) {
 	const isSuppressed = pluginKey in editedSuppressedPlugins && editedSuppressedPlugins[ pluginKey ] !== false;
 
 	const PluginName = () => (
-		<strong>
+		<strong className="plugin-name">
 			{ pluginDetails.Name }
 		</strong>
 	);
 
+	const errorDetails = (
+		<div className="error-details">
+			{
+				isOriginallySuppressed ? (
+					<p>
+						<SuppressedPluginTime suppressedPlugin={ originalSuppressedPlugins[ pluginKey ] } />
+						{ ' ' }
+						<SuppressedPluginUsername suppressedPlugin={ originalSuppressedPlugins[ pluginKey ] } />
+						{ ' ' }
+						<SuppressedPluginVersion
+							pluginDetails={ pluginDetails }
+							suppressedPlugin={ originalSuppressedPlugins[ pluginKey ] }
+						/>
+					</p>
+				) : (
+					<ValidationErrorDetails errors={ pluginDetails.validation_errors } />
+				)
+			}
+		</div>
+	);
+
 	return (
-		<tr>
+		<tr className={ classnames(
+			{
+				'has-border-color': isSuppressed || pluginDetails.validation_errors.length,
+				'has-validation-errors': ! isSuppressed && pluginDetails.validation_errors.length,
+				'is-suppressed': isSuppressed,
+			},
+		) }>
 			<th className="column-status" scope="row">
 				<SelectControl
 					hideLabelFromVision={ true }
@@ -215,32 +251,26 @@ function PluginRow( { pluginKey, pluginDetails } ) {
 			</th>
 			<td className="column-plugin">
 				<ConditionalDetails
-					summary={ pluginDetails.PluginURI ? (
-						<a href={ pluginDetails.PluginURI } target="_blank" rel="noreferrer">
-							<PluginName />
-						</a>
-					)
-						: <PluginName /> }
+					summary={ (
+						<PluginName />
+					) }
 				>
-
 					{ [
 						pluginDetails.Author && (
 							<p className="plugin-author-uri" key={ `${ pluginKey }-details-author` }>
-								<small>
-									{ pluginDetails.AuthorURI ? (
-										<a href={ pluginDetails.AuthorURI } target="_blank" rel="noreferrer">
-											{
-												/* translators: placeholder is an author name. */
-												sprintf( __( 'By %s' ), pluginDetails.Author )
-											}
-										</a> )
-										: (
+								{ pluginDetails.AuthorURI ? (
+									<a href={ pluginDetails.AuthorURI } target="_blank" rel="noreferrer">
+										{
 											/* translators: placeholder is an author name. */
 											sprintf( __( 'By %s' ), pluginDetails.Author )
-										)
-									}
+										}
+									</a> )
+									: (
+										/* translators: placeholder is an author name. */
+										sprintf( __( 'By %s' ), pluginDetails.Author )
+									)
+								}
 
-								</small>
 							</p>
 						),
 						pluginDetails.Description && (
@@ -250,28 +280,19 @@ function PluginRow( { pluginKey, pluginDetails } ) {
 								dangerouslySetInnerHTML={ { __html: autop( pluginDetails.Description ) } }
 							/>
 						),
+						pluginDetails.PluginURI && (
+							<a href={ pluginDetails.PluginURI } target="_blank" rel="noreferrer" key={ `${ pluginKey }-details-plugin-uri` }>
+								{ __( 'More details', 'amp' ) }
+							</a>
+						),
 
 					].filter( ( child ) => child ) }
-
 				</ConditionalDetails>
+
+				{ errorDetails }
 			</td>
 			<td className="column-details">
-				{
-					isOriginallySuppressed ? (
-						<p>
-							<SuppressedPluginTime suppressedPlugin={ originalSuppressedPlugins[ pluginKey ] } />
-							{ ' ' }
-							<SuppressedPluginUsername suppressedPlugin={ originalSuppressedPlugins[ pluginKey ] } />
-							{ ' ' }
-							<SuppressedPluginVersion
-								pluginDetails={ pluginDetails }
-								suppressedPlugin={ originalSuppressedPlugins[ pluginKey ] }
-							/>
-						</p>
-					) : (
-						<ValidationErrorDetails errors={ pluginDetails.validation_errors } />
-					)
-				}
+				{ errorDetails }
 			</td>
 		</tr>
 	);
@@ -303,40 +324,43 @@ export function PluginSuppression() {
 	}
 
 	return (
-		<section>
-			<h2>
-				{ __( 'Plugin Suppression', 'amp' ) }
-			</h2>
-			<Selectable className="plugin-suppression">
-				<p>
-					{ __( 'When a plugin adds markup which is invalid on AMP pages, you have two options: you can review the validation error, determine that the invalid markup is not needed, and let the AMP plugin remove it. Alternatively, you can suppress the offending plugin from running on AMP pages. Below is the list of active plugins which have caused validation issues.', 'amp' ) }
-				</p>
-				<table id="suppressed-plugins-table" className="wp-list-table widefat fixed striped">
-					<thead>
-						<tr>
-							<th className="column-status" scope="col">
-								{ __( 'Status', 'amp' ) }
-							</th>
-							<th className="column-plugin" scope="col">
-								{ __( 'Plugin', 'amp' ) }
-							</th>
-							<th className="column-details" scope="col">
-								{ __( 'Details', 'amp' ) }
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						{ Object.keys( suppressiblePlugins || {} ).map( ( pluginKey ) => (
-							<PluginRow
-								key={ `plugin-row-${ pluginKey }` }
-								pluginDetails={ suppressiblePlugins[ pluginKey ] }
-								pluginKey={ pluginKey }
-							/>
-						) ) }
-					</tbody>
-				</table>
-
-			</Selectable>
-		</section>
+		<AMPDrawer
+			heading={ (
+				<h3>
+					{ __( 'Plugin Suppression', 'amp' ) }
+				</h3>
+			) }
+			hiddenTitle={ __( 'Plugin suppression', 'amp' ) }
+			id="plugin-suppression-drawer"
+			initialOpen={ false }
+		>
+			<p>
+				{ __( 'When a plugin adds markup that is not allowed in AMP you may let the AMP plugin remove it, or you may suppress the plugin from running on AMP pages. The following list includes all active plugins on your site, with any of those detected to be generating invalid AMP markup appearing first.', 'amp' ) }
+			</p>
+			<table id="suppressed-plugins-table" className="wp-list-table widefat fixed">
+				<thead>
+					<tr>
+						<th className="column-status" scope="col">
+							{ __( 'Status', 'amp' ) }
+						</th>
+						<th className="column-plugin" scope="col">
+							{ __( 'Plugin', 'amp' ) }
+						</th>
+						<th className="column-details" scope="col">
+							{ __( 'Details', 'amp' ) }
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					{ Object.keys( suppressiblePlugins || {} ).map( ( pluginKey ) => (
+						<PluginRow
+							key={ `plugin-row-${ pluginKey }` }
+							pluginDetails={ suppressiblePlugins[ pluginKey ] }
+							pluginKey={ pluginKey }
+						/>
+					) ) }
+				</tbody>
+			</table>
+		</AMPDrawer>
 	);
 }

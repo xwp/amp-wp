@@ -792,7 +792,6 @@ class AMP_Validation_Error_Taxonomy {
 		if ( get_taxonomy( self::TAXONOMY_SLUG )->show_in_menu ) {
 			add_action( 'admin_menu', [ __CLASS__, 'add_admin_menu_validation_error_item' ] );
 		}
-		add_action( 'parse_term_query', [ __CLASS__, 'parse_post_php_term_query' ] );
 		add_filter( 'manage_' . self::TAXONOMY_SLUG . '_custom_column', [ __CLASS__, 'filter_manage_custom_columns' ], 10, 3 );
 		add_filter( 'manage_' . AMP_Validated_URL_Post_Type::POST_TYPE_SLUG . '_sortable_columns', [ __CLASS__, 'add_single_post_sortable_columns' ] );
 		add_filter( 'posts_where', [ __CLASS__, 'filter_posts_where_for_validation_error_status' ], 10, 2 );
@@ -1678,28 +1677,6 @@ class AMP_Validation_Error_Taxonomy {
 	}
 
 	/**
-	 * Parses the term query on post.php pages (single error URL).
-	 *
-	 * This post.php page for amp_validated_url is more like an edit-tags.php page,
-	 * in that it has a WP_Terms_List_Table of terms (of type amp_validation_error).
-	 * So this needs to only show the terms (errors) associated with this amp_validated_url post.
-	 *
-	 * @param WP_Term_Query $wp_term_query Instance of WP_Term_Query.
-	 */
-	public static function parse_post_php_term_query( $wp_term_query ) {
-		global $pagenow;
-		if ( ! is_admin() || 'post.php' !== $pagenow || ! isset( $_GET['post'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			return;
-		}
-
-		// Only set the query var if this is the validated URL post type.
-		$post_id = (int) $_GET['post']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( AMP_Validated_URL_Post_Type::POST_TYPE_SLUG === get_post_type( $post_id ) ) {
-			$wp_term_query->query_vars['object_ids'] = $post_id;
-		}
-	}
-
-	/**
 	 * Provides a reader-friendly string for a term's error type.
 	 *
 	 * @param string $error_type The error type from the term's validation error JSON.
@@ -2065,7 +2042,7 @@ class AMP_Validation_Error_Taxonomy {
 						echo wp_kses_post(
 							sprintf(
 								/* translators: 1: script,  2: Documentation URL, 3: Documentation URL, 4: Documentation URL, 5: onclick, 6: Documentation URL, 7: amp-bind, 8: Documentation URL, 9: amp-script */
-								__( 'Arbitrary JavaScript is not allowed in AMP. You cannot use JS %1$s tags unless they are for loading <a href="%2$s">AMP components</a> (which the AMP plugin will add for you automatically). In order for a page to be served as AMP, the invalid JS code must be removed from the page. Learn more about <a href="%3$s">how AMP works</a>. As an alternative to using custom JS, please consider using a pre-built AMP functionality, including <a href="%4$s">actions and events</a> (as opposed to JS event handler attributes like %5$s) and the <a href="%6$s">%7$s</a> component; you may also add custom JS if encapsulated in the <a href="%8$s">%9$s</a>.', 'amp' ),
+								__( 'AMP does not allow the use of JS %1$s tags unless they are for loading <a href="%2$s">AMP components</a>, which are added automatically by the AMP plugin. For any page to be served as AMP, all invalid script tags must be removed from the page. Instead of custom or third-party JS, please consider using AMP components and functionality such as <a href="%6$s">%7$s</a> and <a href="%4$s">actions and events</a> (as opposed to JS event handler attributes like %5$s). Some custom JS can be added if encapsulated in the <a href="%8$s">%9$s</a>. Learn more about <a href="%3$s">how AMP works</a>.', 'amp' ),
 								'<code>&lt;script&gt;</code>',
 								'https://amp.dev/documentation/components/',
 								'https://amp.dev/about/how-amp-works/',
@@ -2095,7 +2072,7 @@ class AMP_Validation_Error_Taxonomy {
 						echo wp_kses_post(
 							sprintf(
 								/* translators: 1: Documentation URL, 2: Documentation URL. */
-								__( 'AMP has specific set of allowed elements and attributes that are allowed in valid AMP pages. Learn about the <a href="%1$s">AMP HTML specification</a>. If an element or attribute is not allowed in AMP, it must be removed for the page to <a href="%2$s">cached and be eligible for prerendering</a>.', 'amp' ),
+								__( 'AMP allows a specific set of elements and attributes on valid AMP pages. Learn about the <a href="%1$s">AMP HTML specification</a>. If an element or attribute is not allowed in AMP, it must be removed for the page to be <a href="%2$s">cached and eligible for prerendering</a>.', 'amp' ),
 								'https://amp.dev/documentation/guides-and-tutorials/learn/spec/amphtml/',
 								'https://amp.dev/documentation/guides-and-tutorials/learn/amp-caches-and-cors/how_amp_pages_are_cached/'
 							)
@@ -2104,7 +2081,7 @@ class AMP_Validation_Error_Taxonomy {
 					<?php endif; ?>
 				</p>
 				<p>
-					<?php echo wp_kses_post( __( 'If you <strong>remove</strong> the invalid markup then it will not block this page from being served as AMP. Note that you need to check what impact the removal of the invalid markup has on the page to see if the result is acceptable. If you <strong>keep</strong> the invalid markup, then the page will not be served as AMP.', 'amp' ) ); ?>
+					<?php echo wp_kses_post( __( 'If all invalid markup is &#8220;removed&#8221; the page will be served as AMP. However, the impact that the removal has on the page must be assessed to determine if the result is acceptable. If any invalid markup is &#8220;kept&#8221; then the page will not be served as AMP.', 'amp' ) ); ?>
 				</p>
 			</dd>
 
@@ -3350,10 +3327,11 @@ class AMP_Validation_Error_Taxonomy {
 	 *
 	 * @see \AMP_Validation_Error_Taxonomy::get_validation_error_sanitization()
 	 *
-	 * @param array $sanitization Sanitization.
+	 * @param array $sanitization     Sanitization.
+	 * @param bool  $include_reviewed Include reviewed/unreviewed status.
 	 * @return string Status text.
 	 */
-	public static function get_status_text_with_icon( $sanitization ) {
+	public static function get_status_text_with_icon( $sanitization, $include_reviewed = false ) {
 		if ( $sanitization['term_status'] & self::ACCEPTED_VALIDATION_ERROR_BIT_MASK ) {
 			$icon = Icon::valid();
 			$text = __( 'Removed', 'amp' );
@@ -3361,6 +3339,17 @@ class AMP_Validation_Error_Taxonomy {
 			$icon = Icon::invalid();
 			$text = __( 'Kept', 'amp' );
 		}
+
+		if ( $include_reviewed ) {
+			$text .= ' (';
+			if ( $sanitization['term_status'] & self::ACKNOWLEDGED_VALIDATION_ERROR_BIT_MASK ) {
+				$text .= __( 'Reviewed', 'amp' );
+			} else {
+				$text .= __( 'Unreviewed', 'amp' );
+			}
+			$text .= ')';
+		}
+
 		return sprintf( '<span class="status-text">%s %s</span>', $icon->to_html(), esc_html( $text ) );
 	}
 }

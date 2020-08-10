@@ -28,6 +28,34 @@ class AMP_Validated_URL_Post_Type {
 	const POST_TYPE_SLUG = 'amp_validated_url';
 
 	/**
+	 * Postmeta key for storing stylesheet data.
+	 *
+	 * @var string
+	 */
+	const STYLESHEETS_POST_META_KEY = '_amp_stylesheets';
+
+	/**
+	 * Postmeta key for storing queried object data.
+	 *
+	 * @var string
+	 */
+	const QUERIED_OBJECT_POST_META_KEY = '_amp_queried_object';
+
+	/**
+	 * Postmeta key for storing validated environment data.
+	 *
+	 * @var string
+	 */
+	const VALIDATED_ENVIRONMENT_POST_META_KEY = '_amp_validated_environment';
+
+	/**
+	 * Postmeta key for storing PHP fatal error data.
+	 *
+	 * @var string
+	 */
+	const PHP_FATAL_ERROR_POST_META_KEY = '_amp_php_fatal_error';
+
+	/**
 	 * The action to recheck URLs for AMP validity.
 	 *
 	 * @var string
@@ -770,6 +798,7 @@ class AMP_Validated_URL_Post_Type {
 	 *     @type int|WP_Post $invalid_url_post Post to update. Optional. If empty, then post is looked up by URL.
 	 *     @type array       $queried_object   Queried object, including keys for type and id. May be empty.
 	 *     @type array       $stylesheets      Stylesheet data. May be empty.
+	 *     @type array       $php_fatal_error  PHP Fatal Error. May be empty.
 	 * }
 	 * @return int|WP_Error $post_id The post ID of the custom post type used, or WP_Error on failure.
 	 * @global WP $wp
@@ -909,26 +938,66 @@ class AMP_Validated_URL_Post_Type {
 		$post_id = $r;
 		wp_set_object_terms( $post_id, wp_list_pluck( $terms, 'term_id' ), AMP_Validation_Error_Taxonomy::TAXONOMY_SLUG );
 
-		update_post_meta( $post_id, '_amp_validated_environment', self::get_validated_environment() );
+		update_post_meta( $post_id, self::VALIDATED_ENVIRONMENT_POST_META_KEY, self::get_validated_environment() );
 		if ( isset( $args['queried_object'] ) ) {
-			update_post_meta( $post_id, '_amp_queried_object', $args['queried_object'] );
+			update_post_meta( $post_id, self::QUERIED_OBJECT_POST_META_KEY, $args['queried_object'] );
 		}
 		if ( isset( $args['stylesheets'] ) ) {
 			// Note that json_encode() is being used here because wp_slash() will coerce scalar values to strings.
-			update_post_meta( $post_id, '_amp_stylesheets', wp_slash( wp_json_encode( $args['stylesheets'] ) ) );
+			update_post_meta( $post_id, self::STYLESHEETS_POST_META_KEY, wp_slash( wp_json_encode( $args['stylesheets'] ) ) );
 		}
 		if ( isset( $args['php_fatal_error'] ) ) {
 			if ( empty( $args['php_fatal_error'] ) ) {
-				delete_post_meta( $post_id, '_amp_php_fatal_error' );
+				delete_post_meta( $post_id, self::PHP_FATAL_ERROR_POST_META_KEY );
 			} else {
 				// Note that json_encode() is being used here because wp_slash() will coerce scalar values to strings.
-				update_post_meta( $post_id, '_amp_php_fatal_error', wp_slash( wp_json_encode( $args['php_fatal_error'] ) ) );
+				update_post_meta( $post_id, self::PHP_FATAL_ERROR_POST_META_KEY, wp_slash( wp_json_encode( $args['php_fatal_error'] ) ) );
 			}
 		}
 
 		delete_transient( static::NEW_VALIDATION_ERROR_URLS_COUNT_TRANSIENT );
 
 		return $post_id;
+	}
+
+	/**
+	 * Delete batch of stylesheets postmeta.
+	 *
+	 * Given that parsed CSS can be quite large (250KB+) and is not de-duplicated across each validated URL, it is important
+	 * to not store the stylesheet data indefinitely in order to not excessively bloat the database. The reality is that
+	 * keeping around the parsed stylesheet data is of little value given that it will quickly go stale as themes and
+	 * plugins are updated.
+	 *
+	 * @since 2.0
+	 *
+	 * @param int          $count  Count of batch size to delete.
+	 * @param string|array $before Date before which to find amp_validated_url posts to delete.
+	 *                             Accepts strtotime()-compatible string, or array of 'year', 'month', 'day' values.
+	 * @return int Count of postmeta that were deleted.
+	 */
+	public static function delete_stylesheets_postmeta_batch( $count, $before ) {
+		$deleted = 0;
+		$query   = new WP_Query(
+			[
+				'post_type'      => self::POST_TYPE_SLUG,
+				'meta_key'       => self::STYLESHEETS_POST_META_KEY,
+				'date_query'     => [
+					[
+						'before' => $before,
+					],
+				],
+				'fields'         => 'ids',
+				'orderby'        => 'date',
+				'order'          => 'ASC',
+				'posts_per_page' => $count,
+			]
+		);
+		foreach ( $query->get_posts() as $post_id ) {
+			if ( delete_post_meta( $post_id, self::STYLESHEETS_POST_META_KEY ) ) {
+				$deleted++;
+			}
+		}
+		return $deleted;
 	}
 
 	/**
@@ -1038,7 +1107,7 @@ class AMP_Validated_URL_Post_Type {
 			return [];
 		}
 
-		$old_validated_environment = get_post_meta( $post->ID, '_amp_validated_environment', true );
+		$old_validated_environment = get_post_meta( $post->ID, self::VALIDATED_ENVIRONMENT_POST_META_KEY, true );
 		$new_validated_environment = self::get_validated_environment();
 
 		$staleness = [];
@@ -1248,9 +1317,9 @@ class AMP_Validated_URL_Post_Type {
 						$style_custom_cdata_spec = $spec_rule[ AMP_Rule_Spec::CDATA ];
 					}
 				}
-				$stylesheets = json_decode( get_post_meta( $post->ID, '_amp_stylesheets', true ), true );
+				$stylesheets = json_decode( get_post_meta( $post->ID, self::STYLESHEETS_POST_META_KEY, true ), true );
 				if ( ! is_array( $stylesheets ) || ! $style_custom_cdata_spec ) {
-					echo '?';
+					echo esc_html( _x( 'n/a', 'CSS usage not available', 'amp' ) );
 				} else {
 					$total_size = 0;
 					foreach ( $stylesheets as $stylesheet ) {
@@ -1293,7 +1362,7 @@ class AMP_Validated_URL_Post_Type {
 	 */
 	public static function render_sources_column( $sources, $post_id ) {
 		$active_theme          = null;
-		$validated_environment = get_post_meta( $post_id, '_amp_validated_environment', true );
+		$validated_environment = get_post_meta( $post_id, self::VALIDATED_ENVIRONMENT_POST_META_KEY, true );
 		if ( isset( $validated_environment['theme'] ) ) {
 			$active_theme = $validated_environment['theme'];
 		}
@@ -1636,14 +1705,19 @@ class AMP_Validated_URL_Post_Type {
 				echo '</p></div>';
 			}
 
-			$status_text   = AMP_Validation_Error_Taxonomy::get_status_text_with_icon( $sanitization );
+			$status_text   = AMP_Validation_Error_Taxonomy::get_status_text_with_icon( $sanitization, true );
 			$status_detail = sprintf( '<dt>%s</dt><dd>%s</dd>', esc_html__( 'Status', 'amp' ), wp_kses_post( $status_text ) );
 
 			$error_details = AMP_Validation_Error_Taxonomy::render_single_url_error_details( $validation_error, $error, false, false );
 			$error_details = str_replace( '<dl class="detailed">', '<dl class="detailed">' . $status_detail, $error_details );
 
+			$class = 'notice error-details';
+			if ( ! ( $sanitization['term_status'] & AMP_Validation_Error_Taxonomy::ACKNOWLEDGED_VALIDATION_ERROR_BIT_MASK ) ) {
+				$class .= ' unreviewed';
+			}
+
 			?>
-			<div class="notice error-details">
+			<div class="<?php echo esc_attr( $class ); ?>">
 				<ul>
 					<?php echo $error_details; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				</ul>
@@ -1667,7 +1741,7 @@ class AMP_Validated_URL_Post_Type {
 	 * @param WP_Post $post Post.
 	 */
 	private static function render_php_fatal_error_admin_notice( WP_Post $post ) {
-		$error = get_post_meta( $post->ID, '_amp_php_fatal_error', true );
+		$error = get_post_meta( $post->ID, self::PHP_FATAL_ERROR_POST_META_KEY, true );
 		if ( empty( $error ) ) {
 			return;
 		}
@@ -2087,7 +2161,7 @@ class AMP_Validated_URL_Post_Type {
 							</strong>
 							<?php
 							esc_html_e(
-								'Review each instance of invalid markup and determine whether the action of removing (or keeping) is approved. You can change the status and click preview to see what impact the invalid markup has on the page. Invalid markup that is not approved is markup which you may not have seen yet or which you want to fix directly in underlying code.',
+								'For each instance of invalid markup, determine whether it can be safely removed or it needs to be kept. You can change the Markup Status (Removed or Kept) and click the Preview Changes button to see its impact on the page. Once the proper action has been taken (Remove or Keep), you can toggle the checkbox the instance as Reviewed.',
 								'amp'
 							);
 							echo '<br><br>';
@@ -2108,16 +2182,16 @@ class AMP_Validated_URL_Post_Type {
 							?>
 						</strong>
 						<?php if ( $is_amp_enabled && count( array_filter( $counts ) ) > 0 ) : ?>
-							<?php esc_html_e( 'AMP is enabled because no invalid markup is kept.', 'amp' ); ?>
+							<?php esc_html_e( 'AMP is enabled because no invalid markup is being kept.', 'amp' ); ?>
 						<?php elseif ( ! $is_amp_enabled ) : ?>
-							<?php esc_html_e( 'AMP is disabled because there is invalid markup kept. To unblock AMP from being served, either mark the invalid markup as removed or fix the code that adds the invalid markup.', 'amp' ); ?>
+							<?php esc_html_e( 'AMP is disabled because some invalid markup has been kept. To enable AMP to be served, either mark the invalid markup as &#8220;removed&#8221; or provide an AMP-compatible fix that eliminates the invalid markup from being generated in the first place.', 'amp' ); ?>
 						<?php endif; ?>
 					</div>
 
 					<div class="misc-pub-section">
 						<?php
 						$view_label     = __( 'View URL', 'amp' );
-						$queried_object = get_post_meta( $post->ID, '_amp_queried_object', true );
+						$queried_object = get_post_meta( $post->ID, self::QUERIED_OBJECT_POST_META_KEY, true );
 						if ( isset( $queried_object['id'], $queried_object['type'] ) ) {
 							$after = ' | ';
 							if ( 'post' === $queried_object['type'] && get_post( $queried_object['id'] ) && post_type_exists( get_post( $queried_object['id'] )->post_type ) ) {
@@ -2197,11 +2271,17 @@ class AMP_Validated_URL_Post_Type {
 	 * @return void
 	 */
 	public static function print_stylesheets_meta_box( $post ) {
-		$stylesheets = get_post_meta( $post->ID, '_amp_stylesheets', true );
+		$stylesheets = get_post_meta( $post->ID, self::STYLESHEETS_POST_META_KEY, true );
 		if ( empty( $stylesheets ) ) {
 			printf(
 				'<p><em>%s</em></p>',
-				esc_html__( 'No stylesheet data available. Please try re-checking this URL.', 'amp' )
+				wp_kses_post(
+					sprintf(
+						/* translators: placeholder is URL to recheck the post */
+						__( 'Stylesheet information for this URL is no longer available. Such data is automatically deleted after a week to reduce database storage. It is of little value to store long-term given that it becomes stale as themes and plugins are updated. To obtain the latest stylesheet information, <a href="%s">recheck this URL</a>.', 'amp' ),
+						esc_url( self::get_recheck_url( $post ) . '#amp_stylesheets' )
+					)
+				)
 			);
 			return;
 		}
@@ -2344,9 +2424,9 @@ class AMP_Validated_URL_Post_Type {
 			<div class="notice notice-alt notice-error inline">
 				<p>
 					<?php if ( 0 === $excluded_stylesheets ) : ?>
-						<?php esc_html_e( 'You have exceeded the CSS budget. Because of this, the page will not be served as a valid AMP page.', 'amp' ); ?>
+						<?php esc_html_e( 'You have exceeded the CSS budget. The page will not be served as a valid AMP page.', 'amp' ); ?>
 					<?php else : ?>
-						<?php esc_html_e( 'You have exceeded the CSS budget. Because of this, stylesheets deemed of lesser priority have been excluded from the page.', 'amp' ); ?>
+						<?php esc_html_e( 'You have exceeded the CSS budget. Stylesheets deemed of lesser priority have been excluded from the page.', 'amp' ); ?>
 					<?php endif; ?>
 					<?php esc_html_e( 'Please review the flagged stylesheets below and determine if the current theme or a particular plugin is including excessive CSS.', 'amp' ); ?>
 				</p>
@@ -2354,7 +2434,7 @@ class AMP_Validated_URL_Post_Type {
 		<?php elseif ( $percentage_budget_used >= AMP_Style_Sanitizer::CSS_BUDGET_WARNING_PERCENTAGE ) : ?>
 			<div class="notice notice-alt notice-warning inline">
 				<p>
-					<?php esc_html_e( 'You are nearing the limit of the CSS budget. Once reaching this limit, stylesheets deemed of lesser priority will be excluded from the page. Please review the stylesheets below and determine if the current theme or a particular plugin is including excessive CSS.', 'amp' ); ?>
+					<?php esc_html_e( 'You are nearing the limit of the CSS budget. Once this limit is reached, stylesheets deemed of lesser priority will be excluded from the page. Please review the stylesheets below and determine if the current theme or a particular plugin is including excessive CSS.', 'amp' ); ?>
 				</p>
 			</div>
 		<?php endif; ?>
@@ -2559,7 +2639,7 @@ class AMP_Validated_URL_Post_Type {
 													esc_attr(
 														'style_attribute' === $stylesheet['origin']
 															?
-															__( 'Selector generated to increase specificity so the cascade is preserved for properties moved from style attribute to CSS rule in style[amp-custom].', 'amp' )
+															__( 'Selector generated to increase specificity so the cascade is preserved for properties moved from style attribute to CSS rules in style[amp-custom].', 'amp' )
 															:
 															__( 'Selector generated to increase specificity for important properties so that the CSS cascade is preserved. AMP does not allow important properties.', 'amp' )
 													)
@@ -2957,7 +3037,7 @@ class AMP_Validated_URL_Post_Type {
 		}
 
 		// Mainly uses the same conditionals as print_status_meta_box().
-		$queried_object = get_post_meta( $post->ID, '_amp_queried_object', true );
+		$queried_object = get_post_meta( $post->ID, self::QUERIED_OBJECT_POST_META_KEY, true );
 		if ( isset( $queried_object['type'], $queried_object['id'] ) ) {
 			$name = null;
 			if ( 'post' === $queried_object['type'] && get_post( $queried_object['id'] ) ) {

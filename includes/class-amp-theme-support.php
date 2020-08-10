@@ -311,7 +311,7 @@ class AMP_Theme_Support {
 		if ( self::is_paired_available() ) {
 			self::setup_paired_browsing_client();
 			add_action( 'template_redirect', [ __CLASS__, 'sanitize_url_for_paired_browsing' ] );
-			add_filter( 'template_include', [ __CLASS__, 'serve_paired_browsing_experience' ] );
+			add_filter( 'template_include', [ __CLASS__, 'serve_paired_browsing_experience' ], PHP_INT_MAX );
 		}
 
 		$has_query_var = (
@@ -1852,9 +1852,23 @@ class AMP_Theme_Support {
 			$dom  = AMP_DOM_Utils::get_dom_from_content( $partial );
 			$args = [
 				'content_max_width'    => ! empty( $content_width ) ? $content_width : AMP_Post_Template::CONTENT_MAX_WIDTH, // Back-compat.
-				'use_document_element' => false,
+				'use_document_element' => true,
 			];
 			AMP_Content_Sanitizer::sanitize_document( $dom, self::$sanitizer_classes, $args ); // @todo Include script assets in response?
+
+			// Move any amp-custom to include in the partial response.
+			$amp_custom_style = $dom->xpath->query( '//style[ @amp-custom ]' )->item( 0 );
+			if ( $amp_custom_style instanceof DOMElement ) {
+				$amp_custom_style->removeAttribute( Attribute::AMP_CUSTOM );
+				$amp_custom_style->setAttribute( 'amp-custom-partial', '' );
+				$amp_custom_style->textContent = str_replace(
+					'/*# sourceURL=amp-custom.css */',
+					'/*# sourceURL=amp-custom-partial.css */',
+					$amp_custom_style->textContent
+				);
+				$dom->body->appendChild( $amp_custom_style ); // @todo This could cause layout problems. It may be preferable to move to the head.
+			}
+
 			$partial = AMP_DOM_Utils::get_content_from_dom( $dom );
 		}
 		return $partial;
@@ -2401,6 +2415,13 @@ class AMP_Theme_Support {
 			return;
 		}
 
+		/**
+		 * Fires before registering plugin assets that may require core asset polyfills.
+		 *
+		 * @internal
+		 */
+		do_action( 'amp_register_polyfills' );
+
 		$asset_file   = AMP__DIR__ . '/assets/js/amp-paired-browsing-client.asset.php';
 		$asset        = require $asset_file;
 		$dependencies = $asset['dependencies'];
@@ -2489,6 +2510,9 @@ class AMP_Theme_Support {
 				[ 'response' => 403 ]
 			);
 		}
+
+		/** This action is documented in includes/class-amp-theme-support.php */
+		do_action( 'amp_register_polyfills' );
 
 		wp_enqueue_style(
 			'amp-paired-browsing-app',

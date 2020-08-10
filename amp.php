@@ -5,7 +5,7 @@
  * Plugin URI: https://amp-wp.org
  * Author: AMP Project Contributors
  * Author URI: https://github.com/ampproject/amp-wp/graphs/contributors
- * Version: 2.0.0-beta1
+ * Version: 2.0.0-beta3
  * Text Domain: amp
  * Domain Path: /languages/
  * License: GPLv2 or later
@@ -17,7 +17,7 @@
 
 define( 'AMP__FILE__', __FILE__ );
 define( 'AMP__DIR__', dirname( __FILE__ ) );
-define( 'AMP__VERSION', '2.0.0-beta1' );
+define( 'AMP__VERSION', '2.0.0-beta3' );
 
 /**
  * Errors encountered while loading the plugin.
@@ -251,4 +251,4 @@ register_activation_hook( __FILE__, 'amp_activate' );
 
 register_deactivation_hook( __FILE__, 'amp_deactivate' );
 
-amp_bootstrap_plugin();
+add_action( 'plugins_loaded', 'amp_bootstrap_plugin', defined( 'PHP_INT_MIN' ) ? PHP_INT_MIN : ~PHP_INT_MAX ); // phpcs:ignore PHPCompatibility.Constants.NewConstants.php_int_minFound

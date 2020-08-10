@@ -54,10 +54,23 @@ function amp_deactivate( $network_wide = false ) {
  * @since 1.5
  */
 function amp_bootstrap_plugin() {
+	/**
+	 * Filters whether AMP is enabled on the current site.
+	 *
+	 * Useful if the plugin is network activated and you want to turn it off on select sites.
+	 *
+	 * @since 0.2
+	 * @since 2.0 Filter now runs earlier at plugins_loaded (with earliest priority) rather than at the after_setup_theme action.
+	 */
+	if ( false === apply_filters( 'amp_is_enabled', true ) ) {
+		return;
+	}
+
 	AmpWpPluginFactory::create()->register();
 
-	// The plugins_loaded action is the earliest we can run this since that is when pluggable.php has been required and wp_hash() is available.
-	add_action( 'plugins_loaded', [ 'AMP_Validation_Manager', 'init_validate_request' ], ~PHP_INT_MAX );
+	// The amp_bootstrap_plugin() function is called at the plugins_loaded action with the earliest priority. This is
+	// the earliest we can run this since that is when pluggable.php has been required and wp_hash() is available.
+	AMP_Validation_Manager::init_validate_request();
 
 	/*
 	 * Register AMP scripts regardless of whether AMP is enabled or it is the AMP endpoint
@@ -176,25 +189,32 @@ function amp_init() {
 	 * by Preview component located in <assets/src/setup/pages/save/index.js>.
 	 */
 	add_action(
-		'wp_print_footer_scripts',
+		'wp_print_scripts',
 		function() {
 			if ( ! amp_is_dev_mode() || ! is_admin_bar_showing() ) {
 				return;
 			}
 			?>
 			<script data-ampdevmode>
-				document.addEventListener( 'DOMContentLoaded', function() {
+				( () => {
 					if ( 'amp-wizard-completion-preview' !== window.name ) {
 						return;
 					}
 
-					const adminBar = document.getElementById( 'wpadminbar' );
-					if ( adminBar ) {
-						document.body.classList.remove( 'admin-bar' );
-						document.documentElement.style.cssText += '; margin-top: 0 !important';
-						adminBar.remove();
-					}
-				});
+					/** @type {HTMLStyleElement} */
+					const style = document.createElement( 'style' );
+					style.setAttribute( 'type', 'text/css' );
+					style.appendChild( document.createTextNode( 'html { margin-top: 0 !important; } #wpadminbar { display: none !important; }' ) );
+					document.head.appendChild( style );
+
+					document.addEventListener( 'DOMContentLoaded', function() {
+						const adminBar = document.getElementById( 'wpadminbar' );
+						if ( adminBar ) {
+							document.body.classList.remove( 'admin-bar' );
+							adminBar.remove();
+						}
+					});
+				} )();
 			</script>
 			<?php
 		}
@@ -212,15 +232,20 @@ function amp_init() {
 function amp_after_setup_theme() {
 	amp_get_slug(); // Ensure AMP_QUERY_VAR is set.
 
-	/**
-	 * Filters whether AMP is enabled on the current site.
-	 *
-	 * Useful if the plugin is network activated and you want to turn it off on select sites.
-	 *
-	 * @since 0.2
-	 */
+	/** This filter is documented in includes/amp-helper-functions.php */
 	if ( false === apply_filters( 'amp_is_enabled', true ) ) {
-		return;
+		_doing_it_wrong(
+			'add_filter',
+			esc_html(
+				sprintf(
+					/* translators: 1: amp_is_enabled filter name, 2: plugins_loaded action */
+					__( 'Filter for "%1$s" added too late. To disable AMP, this filter must be added before the "%2$s" action.', 'amp' ),
+					'amp_is_enabled',
+					'plugins_loaded'
+				)
+			),
+			'2.0'
+		);
 	}
 
 	add_action( 'init', 'amp_init', 0 ); // Must be 0 because widgets_init happens at init priority 1.
@@ -339,11 +364,16 @@ function amp_is_canonical() {
  * @return bool
  */
 function amp_is_legacy() {
-	return (
-		AMP_Theme_Support::READER_MODE_SLUG === AMP_Options_Manager::get_option( Option::THEME_SUPPORT )
-		&&
-		ReaderThemes::DEFAULT_READER_THEME === AMP_Options_Manager::get_option( Option::READER_THEME )
-	);
+	if ( AMP_Theme_Support::READER_MODE_SLUG !== AMP_Options_Manager::get_option( Option::THEME_SUPPORT ) ) {
+		return false;
+	}
+
+	$reader_theme = AMP_Options_Manager::get_option( Option::READER_THEME );
+	if ( ReaderThemes::DEFAULT_READER_THEME === $reader_theme ) {
+		return true;
+	}
+
+	return ! wp_get_theme( $reader_theme )->exists();
 }
 
 /**
@@ -364,7 +394,7 @@ function amp_add_frontend_actions() {
  * @global string $pagenow
  * @global WP_Query $wp_query
  */
-function is_amp_available() {
+function amp_is_available() {
 	global $pagenow, $wp_query;
 
 	// Short-circuit for admin requests or requests to non-frontend pages.
@@ -380,14 +410,14 @@ function is_amp_available() {
 		$message = sprintf(
 			/* translators: %1$s: is_amp_endpoint(), %2$s: the current action, %3$s: the wp action, %4$s: the WP_Query class, %5$s: the amp_skip_post() function */
 			__( '%1$s (or %2$s) was called too early and so it will not work properly. WordPress is currently doing the "%3$s" action. Calling this function before the "%4$s" action means it will not have access to %5$s and the queried object to determine if it is an AMP response, thus neither the "%6$s" filter nor the AMP enabled toggle will be considered.', 'amp' ),
-			'is_amp_available()',
+			'amp_is_available()',
 			'is_amp_endpoint()',
 			current_action(),
 			'wp',
 			'WP_Query',
 			'amp_skip_post()'
 		);
-		_doing_it_wrong( 'is_amp_available', esc_html( $message ), '2.0.0' );
+		_doing_it_wrong( 'amp_is_available', esc_html( $message ), '2.0.0' );
 		$warned = true;
 	};
 
@@ -723,7 +753,7 @@ function amp_add_amphtml_link() {
 		return;
 	}
 
-	if ( ! is_amp_available() ) {
+	if ( ! amp_is_available() ) {
 		printf( '<!-- %s -->', esc_html__( 'There is no amphtml version available for this URL.', 'amp' ) );
 		return;
 	}
@@ -793,11 +823,11 @@ function is_amp_endpoint() {
 	);
 
 	// If AMP is not available, then it's definitely not an AMP endpoint.
-	if ( ! is_amp_available() ) {
+	if ( ! amp_is_available() ) {
 		// But, if WP_Query was not available yet, then we will just assume the query is supported since at this point we do
 		// know either that the site is in Standard mode or the URL was requested with the AMP query var. This can still
 		// produce an undesired result when a Standard mode site has a post that opts out of AMP, but this issue will
-		// have been flagged via _doing_it_wrong() in is_amp_available() above.
+		// have been flagged via _doing_it_wrong() in amp_is_available() above.
 		if ( ! did_action( 'wp' ) || ! $wp_query instanceof WP_Query ) {
 			return $is_amp_url && AMP_Options_Manager::get_option( Option::ALL_TEMPLATES_SUPPORTED );
 		}
@@ -873,41 +903,6 @@ function amp_add_generator_metadata() {
  * @param WP_Scripts $wp_scripts Scripts.
  */
 function amp_register_default_scripts( $wp_scripts ) {
-	/*
-	 * Polyfill dependencies that are registered in Gutenberg and WordPress 5.0.
-	 * Note that Gutenberg will override these at wp_enqueue_scripts if it is active.
-	 */
-	$handles = [ 'wp-i18n', 'wp-dom-ready', 'wp-polyfill', 'wp-url' ];
-	foreach ( $handles as $handle ) {
-		if ( ! isset( $wp_scripts->registered[ $handle ] ) ) {
-			$asset_file   = AMP__DIR__ . '/assets/js/' . $handle . '.asset.php';
-			$asset        = require $asset_file;
-			$dependencies = $asset['dependencies'];
-			$version      = $asset['version'];
-
-			$wp_scripts->add(
-				$handle,
-				amp_get_asset_url( sprintf( 'js/%s.js', $handle ) ),
-				$dependencies,
-				$version
-			);
-		}
-	}
-
-	$vendor_scripts = [
-		'lodash' => [
-			'dependencies' => [],
-			'version'      => '4.17.15',
-		],
-	];
-	foreach ( $vendor_scripts as $handle => $handle_data ) {
-		if ( ! isset( $wp_scripts->registered[ $handle ] ) ) {
-			$path = amp_get_asset_url( sprintf( 'js/vendor/%s.js', $handle ) );
-
-			$wp_scripts->add( $handle, $path, $handle_data['dependencies'], $handle_data['version'], 1 );
-		}
-	}
-
 	// AMP Runtime.
 	$handle = 'amp-runtime';
 	$wp_scripts->add(
@@ -1152,7 +1147,7 @@ function amp_get_analytics( $analytics = [] ) {
 	 *
 	 * @since 0.7
 	 *
-	 * @param array $analytics_entries An associative array of the analytics entries we want to output. Each array entry must have a unique key, and the value should be an array with the following keys: `type`, `attributes`, `script_data`. See readme for more details.
+	 * @param array $analytics_entries An associative array of the analytics entries we want to output. Each array entry must have a unique key, and the value should be an array with the following keys: `type`, `attributes`, `config_data`. See readme for more details.
 	 */
 	$analytics_entries = apply_filters( 'amp_analytics_entries', $analytics_entries );
 
@@ -1161,11 +1156,13 @@ function amp_get_analytics( $analytics = [] ) {
 	}
 
 	foreach ( $analytics_entries as $entry_id => $entry ) {
-		$analytics[ $entry_id ] = [
-			'type'        => $entry['type'],
-			'attributes'  => isset( $entry['attributes'] ) ? $entry['attributes'] : [],
-			'config_data' => json_decode( $entry['config'] ),
-		];
+		if ( ! isset( $entry['attributes'] ) ) {
+			$entry['attributes'] = [];
+		}
+		if ( ! isset( $entry['config_data'] ) && isset( $entry['config'] ) && is_string( $entry['config'] ) ) {
+			$entry['config_data'] = json_decode( $entry['config'] );
+		}
+		$analytics[ $entry_id ] = $entry;
 	}
 
 	return $analytics;
@@ -1204,14 +1201,13 @@ function amp_print_analytics( $analytics ) {
 
 	// Can enter multiple configs within backend.
 	foreach ( $analytics_entries as $id => $analytics_entry ) {
-		if ( ! isset( $analytics_entry['type'], $analytics_entry['attributes'], $analytics_entry['config_data'] ) ) {
+		if ( ! isset( $analytics_entry['attributes'], $analytics_entry['config_data'] ) ) {
 			_doing_it_wrong(
 				__FUNCTION__,
 				sprintf(
 					/* translators: 1: the analytics entry ID. 2: type. 3: attributes. 4: config_data. 5: comma-separated list of the actual entry keys. */
-					esc_html__( 'Analytics entry for %1$s is missing one of the following keys: `%2$s`, `%3$s`, or `%4$s` (array keys: %5$s)', 'amp' ),
+					esc_html__( 'Analytics entry for %1$s is missing one of the following keys: `%2$s` or `%3$s` (array keys: %4$s)', 'amp' ),
 					esc_html( $id ),
-					'type',
 					'attributes',
 					'config_data',
 					esc_html( implode( ', ', array_keys( $analytics_entry ) ) )
@@ -1229,12 +1225,13 @@ function amp_print_analytics( $analytics ) {
 		);
 
 		$amp_analytics_attr = array_merge(
-			[
-				'id'   => $id,
-				'type' => $analytics_entry['type'],
-			],
+			compact( 'id' ),
 			$analytics_entry['attributes']
 		);
+
+		if ( ! empty( $analytics_entry['type'] ) ) {
+			$amp_analytics_attr['type'] = $analytics_entry['type'];
+		}
 
 		echo AMP_HTML_Utils::build_tag( 'amp-analytics', $amp_analytics_attr, $script_element ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
@@ -1666,7 +1663,10 @@ function amp_get_schemaorg_metadata() {
 
 	$publisher_logo = amp_get_publisher_logo();
 	if ( $publisher_logo ) {
-		$metadata['publisher']['logo'] = $publisher_logo;
+		$metadata['publisher']['logo'] = [
+			'@type' => 'ImageObject',
+			'url'   => $publisher_logo,
+		];
 	}
 
 	$queried_object = get_queried_object();
@@ -1767,7 +1767,7 @@ function amp_wp_kses_mustache( $markup ) {
  * @param WP_Admin_Bar $wp_admin_bar Admin bar.
  */
 function amp_add_admin_bar_view_link( $wp_admin_bar ) {
-	if ( is_admin() || amp_is_canonical() || ! is_amp_available() ) {
+	if ( is_admin() || amp_is_canonical() || ! amp_is_available() ) {
 		return;
 	}
 

@@ -12,6 +12,7 @@ use AmpProject\AmpWP\Admin\ReaderThemes;
 use AmpProject\AmpWP\OptionsRESTController;
 use AmpProject\AmpWP\PluginRegistry;
 use AmpProject\AmpWP\PluginSuppression;
+use AmpProject\AmpWP\Services;
 use AmpProject\AmpWP\Tests\Helpers\ThemesApiRequestMocking;
 use WP_REST_Request;
 use WP_UnitTestCase;
@@ -79,6 +80,7 @@ class OptionsRESTControllerTest extends WP_UnitTestCase {
 				'suppressed_plugins',
 				'supported_templates',
 				'supported_post_types',
+				'analytics',
 				'preview_permalink',
 				'suppressible_plugins',
 				'supportable_post_types',
@@ -89,10 +91,12 @@ class OptionsRESTControllerTest extends WP_UnitTestCase {
 			array_keys( $data )
 		);
 
-		$this->assertEquals( [], $data['suppressible_plugins'] );
+		/** @var PluginRegistry $plugin_registry */
+		$plugin_registry = Services::get( 'plugin_registry' );
+
+		$this->assertEqualSets( array_keys( $plugin_registry->get_plugins( true ) ), array_keys( $data['suppressible_plugins'] ) );
 		$this->assertEquals( null, $data['preview_permalink'] );
 		$this->assertEquals( [], $data['suppressed_plugins'] );
-		$this->assertEquals( [], $data['suppressible_plugins'] );
 		$this->assertArraySubset( [ 'post', 'page', 'attachment' ], wp_list_pluck( $data['supportable_post_types'], 'name' ) );
 		$this->assertEquals( [ 'post', 'page' ], $data['supported_post_types'] );
 		$this->assertContains( 'is_singular', wp_list_pluck( $data['supportable_templates'], 'id' ) );
