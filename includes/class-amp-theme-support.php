@@ -156,10 +156,10 @@ class AMP_Theme_Support {
 		AMP_Core_Theme_Sanitizer::extend_theme_support();
 
 		/*
-		* Note that wp action is used instead of template_redirect because some themes/plugins output
-		* the response at this action and then short-circuit with exit. So this is why the preceding
-		* action to template_redirect--the wp action--is used instead.
-		*/
+		 * Note that wp action is used instead of template_redirect because some themes/plugins output
+		 * the response at this action and then short-circuit with exit. So this is why the preceding
+		 * action to template_redirect--the wp action--is used instead.
+		 */
 		if ( ! is_admin() ) {
 			add_action( 'wp', [ __CLASS__, 'finish_init' ], PHP_INT_MAX );
 		}
