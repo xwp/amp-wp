@@ -1936,15 +1936,11 @@ class AMP_Theme_Support {
 			header( 'Content-Type: text/html; charset=utf-8' );
 		}
 
-		// Get request for shadow DOM.
-		$app_shell_component = AMP_App_Shell::get_requested_app_shell_component();
-
 		$args = array_merge(
 			[
 				'content_max_width'    => ! empty( $content_width ) ? $content_width : AMP_Post_Template::CONTENT_MAX_WIDTH, // Back-compat.
 				'use_document_element' => true,
 				'user_can_validate'    => AMP_Validation_Manager::has_cap(),
-				'app_shell_component'  => $app_shell_component,
 			],
 			$args
 		);
