@@ -3245,7 +3245,6 @@ class AMP_Style_Sanitizer extends AMP_Base_Sanitizer {
 							$this->has_used_attributes( $parsed_selector[ self::SELECTOR_EXTRACTED_ATTRIBUTES ] )
 						)
 					);
-
 					$selectors[ $selector ] = $should_include;
 					if ( $should_include ) {
 						$used_selector_count++;
