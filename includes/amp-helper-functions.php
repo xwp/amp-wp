@@ -803,8 +803,7 @@ function is_amp_endpoint() {
 		return true;
 	}
 
-	$support_args = AMP_Theme_Support::get_theme_support_args();
-	$is_amp_url   = (
+	$is_amp_url = (
 		amp_is_canonical()
 		||
 		isset( $_GET[ amp_get_slug() ] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -813,12 +812,6 @@ function is_amp_endpoint() {
 			$wp_query instanceof WP_Query
 			&&
 			false !== $wp_query->get( amp_get_slug(), false )
-		)
-		||
-		(
-			isset( $support_args['app_shell'] )
-			&&
-			'inner' === AMP_App_Shell::get_requested_app_shell_component()
 		)
 	);
 
